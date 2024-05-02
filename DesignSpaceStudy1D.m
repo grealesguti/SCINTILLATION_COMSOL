@@ -9,7 +9,8 @@ function DesignSpaceStudy1D(savename,objective_name)
     maxmeshsize_nominal = 0.0015;
     minmeshsize_nominal = 0.00075;
     %objective_name = 'Wm+We';
-    objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, 1, objective_name);
+    
+    objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname,0 , objective_name);
     
     x0 = 0.1;
     xend = 1.9;
