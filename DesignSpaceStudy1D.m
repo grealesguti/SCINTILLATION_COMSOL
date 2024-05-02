@@ -1,5 +1,13 @@
-function DesignSpaceStudy1D(savename,objective_name)
+function DesignSpaceStudy1D(savename,objective_name,server)
     LibInitialization()
+	if server
+		addpath('/apps/generic/comsol/6.2/mli/');
+		pause(10);
+		mphstart(2036);
+		pltoption=0;
+	else
+		pltoption=1;
+	end
     modelname = 'Scintillator3D_1DStudy_2Dgeomv2 - Copy.mph';
     
     % Define model constants
@@ -10,7 +18,7 @@ function DesignSpaceStudy1D(savename,objective_name)
     minmeshsize_nominal = 0.00075;
     %objective_name = 'Wm+We';
     
-    objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname,0 , objective_name);
+    objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name);
     
     x0 = 0.1;
     xend = 1.9;
