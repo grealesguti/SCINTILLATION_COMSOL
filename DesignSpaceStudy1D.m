@@ -1,4 +1,4 @@
-function DesignSpaceStudy1D(savename,objective_name,server)
+function DesignSpaceStudy1D(savename,objective_name,server,steps)
     LibInitialization()
 	if server
 		addpath('/apps/generic/comsol/6.2/mli/');
@@ -22,7 +22,7 @@ function DesignSpaceStudy1D(savename,objective_name,server)
     
     x0 = 0.1;
     xend = 1.9;
-    steps = 50;
+    %steps = 50;
     Rst = zeros(steps + 2, 1);
     xa = zeros(steps + 2, 1);
     
