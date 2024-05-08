@@ -42,7 +42,7 @@ classdef Objective1DAdapSearch
             if (x0 < x) && (x < xend)
                 FUN = @(Ip) obj.ObjectiveQuad_1D(Ip, x);
                 [WI, ~, ~, t, y] = adaptiveSimpson(FUN, I0, IEND, 'parts', 2);
-                saveData(append('Rst/', obj.savename, num2str(x), obj.creationDate), 't', t, 'y', y);
+                saveData(append('Rst/', obj.savename, '_x_',num2str(x, '%.3f'),'_date_', obj.creationDate), 't', t, 'y', y);
                 WI = -WI;
                 disp(['Objective value: ', sprintf('%.2e', WI)]);
             else

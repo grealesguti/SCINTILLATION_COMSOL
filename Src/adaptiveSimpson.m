@@ -1,4 +1,4 @@
-function [Q fcnEvals iter] = adaptiveSimpson(fcn, a, b, varargin)
+function [Q, fcnEvals, iter, t, y] = adaptiveSimpson(fcn, a, b, varargin)
 % adaptiveSimpson - Numerically evaluate integral, adaptive Simpson quadrature. 
 %
 % function [Q fcnEvals iter] = adaptiveSimpson(fcn, a, b, varargin)
@@ -41,6 +41,10 @@ function [Q fcnEvals iter] = adaptiveSimpson(fcn, a, b, varargin)
 % References:
 %   [1] Gander, W. & Gautschi, W. Adaptive Quadrature - Revisited
 %       Eidgenoessische technische Hochschule Zuerich, 2000.
+
+% output initialization
+t=[];y=[];
+
 % check scalar limits of interval
 if ~isscalar(a) || ~isscalar(b)
   error('Matlab:adaptiveSimpson:Limits',...
@@ -121,7 +125,7 @@ while 1
   % regular termination
   if STOP1
     Q = Q + sum(Q2 + diffQ / 15, 2);
-    fprintf('Simpson iter: %f diffmax: %e, tol: %e\n', iter, crit, tol);
+    fprintf('Simpson iter: %f diffmax: %e, tol: %e\n, Q1: %e, Q2: %e', iter, crit, tol, Q1, Q2);
     break
   else
     fprintf('Simpson iter: %f diffmax: %e, tol: %e, num_int: %f\n', iter, crit, tol, length(idx));
