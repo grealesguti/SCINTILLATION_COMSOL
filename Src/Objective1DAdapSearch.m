@@ -23,7 +23,7 @@ classdef Objective1DAdapSearch
             obj.Surf = Surf;
             obj.Surfin = Surfin;        
             obj.model = mphopen(model);
-            obj.creationDate = datestr(now, 'yyyymmdd');
+            obj.creationDate = datestr(now, 'yyyymmdd_HHMM');
             obj.objective = objective;
             obj.savename = savename;
         end
@@ -42,7 +42,9 @@ classdef Objective1DAdapSearch
             if (x0 < x) && (x < xend)
                 FUN = @(Ip) obj.ObjectiveQuad_1D(Ip, x);
                 [WI, ~, ~, t, y] = adaptiveSimpson(FUN, I0, IEND, 'parts', 2);
-                saveData(append('Rst/', obj.savename, '_x_',num2str(x, '%.3f'),'_date_', obj.creationDate), 't', t, 'y', y);
+                name_ty=append('Rst/', obj.savename, '_x_',num2str(x, '%.3f'),'_date_', obj.creationDate);
+                saveData(name_ty, 't', t, 'y', y);
+                disp(['t & y Variables saved to ', name_ty]);
                 WI = -WI;
                 disp(['Objective value: ', sprintf('%.2e', WI)]);
             else

@@ -31,6 +31,8 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps)
         disp(x)
         Rst(i) = objectiveFunctionSearch.compute(x);
         xa(i) = x;
-        saveData(append('Rst/', savename, objectiveFunctionSearch.creationDate), 'xa', xa, 'Rst', Rst, 'objective_name', objective_name, 'modelname', modelname, 'x0', x0, 'xend', xend, 'steps', steps);
+        name_save= append('Rst/', savename, objectiveFunctionSearch.creationDate);
+        saveData(name_save, 'xa', xa, 'Rst', Rst, 'objective_name', objective_name, 'modelname', modelname, 'x0', x0, 'xend', xend, 'steps', steps);
+        disp(['xa & Rst Variables saved to ', name_save]);
     end
 end
