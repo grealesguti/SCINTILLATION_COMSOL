@@ -8,10 +8,11 @@ classdef Objective1DAdapSearch
         plt
         objective
         Surfin
+        savename
     end
     
     methods
-        function obj = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surfin, model, plt, objective)
+        function obj = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surfin, model, plt, objective, savename)
             import com.comsol.model.util.* 
             obj.plt = plt;
             if plt
@@ -24,6 +25,7 @@ classdef Objective1DAdapSearch
             obj.model = mphopen(model);
             obj.creationDate = datestr(now, 'yyyymmdd');
             obj.objective = objective;
+            obj.savename = savename;
         end
         
         function WI = compute(obj, x)
@@ -39,7 +41,8 @@ classdef Objective1DAdapSearch
 
             if (x0 < x) && (x < xend)
                 FUN = @(Ip) obj.ObjectiveQuad_1D(Ip, x);
-                [WI, ~, ~] = adaptiveSimpson(FUN, I0, IEND, 'parts', 2);
+                [WI, ~, ~, t, y] = adaptiveSimpson(FUN, I0, IEND, 'parts', 2);
+                saveData(append('Rst/', obj.savename, num2str(x), obj.creationDate), 't', t, 'y', y);
                 WI = -WI;
                 disp(['Objective value: ', sprintf('%.2e', WI)]);
             else
