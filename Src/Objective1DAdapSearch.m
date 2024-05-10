@@ -51,7 +51,32 @@ classdef Objective1DAdapSearch
                 WI = 1000;
             end
         end
-        
+
+
+        function WI = compute_Nvar(obj, x, Nvar)
+            % Print vector x to the screen
+            fprintf('Vector x: ');
+            disp(x);
+
+            LYSO_L = 0.0275;
+            I0 = 0.01;
+            IEND = 0.9;
+            x0 = 0.05;
+            xend = 1.95;
+
+            if (x0 < x) && (x < xend)
+                FUN = @(Ip) obj.ObjectiveQuad_Nvar(Ip, x, Nvar);
+                [WI, ~, ~, t, y] = adaptiveSimpson(FUN, I0, IEND, 'parts', 2);
+                name_ty=append('Rst/', obj.savename, '_x_',num2str(x, '%.3f'),'_date_', obj.creationDate);
+                saveData(name_ty, 't', t, 'y', y);
+                disp(['t & y Variables saved to ', name_ty]);
+                WI = -WI;
+                disp(['Objective value: ', sprintf('%.2e', WI)]);
+            else
+                WI = 1000;
+            end
+        end        
+
         function WI = ObjectiveQuad_1D(obj, Ip, x)
             % Initialize Run function
             FUN = @(xx) obj.RunModel_Case(xx, x);
@@ -62,8 +87,20 @@ classdef Objective1DAdapSearch
             end
             WI = WI';
         end
-        
-        function [Wet,Wmt,We_int,Wm_int,We,Wm,We_in,Wm_in] = RunModel_AllRst(obj, Ip, x)
+
+        function WI = ObjectiveQuad_Nvar(obj, Ip, x, Nvar)
+            % Initialize Run function
+            FUN = @(xx) obj.RunModel_Case_Nvar(xx, x, Nvar);
+            WI = zeros(length(Ip), 1);
+            for i = 1:length(Ip)
+                disp(['Solving impact number: ', num2str(i), ' Out of: ', num2str(length(Ip)), '. Location: ', num2str(Ip(i))]);
+                WI(i) = FUN(Ip(i));
+            end
+            WI = WI';
+        end        
+
+
+        function [Wt] = RunModel_Case_Nvar(obj, Ip, x, Nvar)
             mesh_min = obj.minmeshsize_nominal;
             mesh_max = obj.maxmeshsize_nominal;
             obj.model = obj.model;
@@ -72,32 +109,56 @@ classdef Objective1DAdapSearch
             obj.model.param.set('maxmeshsize', mesh_max);
             obj.model.param.set('minmeshsize', mesh_min);
             obj.model.param.set('impact_location', Ip); % loaded as percentage over 1
-            obj.model.param.set('Study1D', x);
+
+            for i=1:Nvar/2
+                obj.model.param.set(append('p',num2str(i-1)), x(i));
+                obj.model.param.set(append('m',num2str(i-1)), x(i+Nvar/2));
+            end
 
             % RUN
             obj.model.component('comp1').geom('geom1').run;
             obj.model.component('comp1').mesh('mesh1').run;
             figure(1)
-            mphmesh(obj.model)
+            if obj.plt
+                mphmesh(obj.model)
+            end
             %saveas(gcf, append('./MeshConv/mesh_',num2str(Ip),'_',num2str(mesh_max),'_',num2str(mesh_min),'.png')); % Change the path as needed
             %saveas(gcf, append('./MeshConv/mesh_',num2str(Ip),'_',num2str(mesh_max),'_',num2str(mesh_min),'.fig')); % Change the path as needed
 
             obj.model.study('std1').feature('time').set('tlist', 'range(0,1e-11,1.5e-9)');
             obj.model.study('std1').run;
+            switch obj.objective
+                case 'Wm'
+                    Wm = mphint2(obj.model, 'temw.Wm', 'line', 'selection', obj.Surf);
+                    Wt = trapz(Wm);
+                case 'We'
+                    We = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surf);
+                    Wt = trapz(We);
+                case '(Wm+We)/Wm_in'
+                    Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);
+                    W_in = mphint2(obj.model, 'temw.Wm', 'line', 'selection', obj.Surfin);
+                    Wt = trapz(Wem./W_in);
+                case '(Wm+We)/We_in'
+                    Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);
+                    W_in = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surfin);
+                    Wt = trapz(Wem./W_in);
+                case '(Wm+We)/(We_in+Wm_in)'
+                    Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);
+                    W_in = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surfin);
+                    Wt = trapz(Wem./W_in);
+                case 'Wm+We'
+                    Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);
+                    Wt = trapz(Wem);
+                case '(Wm+We)/(We_in+Wm_in)*ymin'
+                    Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);
+                    W_in = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surfin);
+                    ymin = str2double(regexprep(char(obj.model.param.get('ymin')), '[^\d\.]', ''));
+                    Wt = trapz(Wem./W_in) * (-ymin);
+                otherwise
+                    error('Unknown objective: %s', obj.objective);
+            end
 
-            Wm = mphint2(obj.model, 'temw.Wm', 'line', 'selection', obj.Surf);
-            Wmt = trapz(Wm);
-
-            We = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surf);
-            Wet = trapz(We);
-
-            Wm_in = mphint2(obj.model, 'temw.Wm', 'line', 'selection', obj.Surfin);
-            Wm_int = trapz(Wm_in);
-
-            We_in = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surfin);
-            We_int = trapz(We_in);        
         end
-
 
         function [Wt] = RunModel_Case(obj, Ip, x)
             mesh_min = obj.minmeshsize_nominal;
@@ -155,6 +216,16 @@ classdef Objective1DAdapSearch
 
         end
 
+
+        function ConVal=ComsolVolumeConstraint(obj, Object, Domains, MaxVal)
+            obj.model.component('comp1').geom('geom1').measure().selection().init(2);
+            obj.model.component('comp1').geom('geom1').measure().selection().set('uni1',[1,2]);
+            VarComsolVal=obj.model.component('comp1').geom('geom1').measure().getVolume();
+            %VarComsolVal=obj.model.component('comp1').geom(Domains).measure().getVolume();
+            %VarComsolVal=obj.model.param.get(ComsolVarName); % I KNOW THIS IS WRONG
+            ConVal = VarComsolVal/MaxVal-1;
+        end
+
         function saveData(obj, folder, mainName)
             % Save variables to .mat file
             matFileName = fullfile(folder, [mainName '_' obj.creationDate '.mat']);
@@ -169,6 +240,11 @@ classdef Objective1DAdapSearch
             disp(['Variables saved to ', csvFileName]);
         end
 
+        % Define output function
+        function stop = outfun(obj, x, optimValues, state)
+            stop = false; % Continue optimization
+            fprintf('Iteration: %d, x = %f, fval = %f\n', optimValues.iteration, x, optimValues.fval);
+        end
 
     end
 end
