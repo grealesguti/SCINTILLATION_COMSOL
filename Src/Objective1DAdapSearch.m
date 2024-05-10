@@ -9,6 +9,7 @@ classdef Objective1DAdapSearch
         objective
         Surfin
         savename
+        counter
     end
     
     methods
@@ -26,6 +27,7 @@ classdef Objective1DAdapSearch
             obj.creationDate = datestr(now, 'yyyymmdd_HHMM');
             obj.objective = objective;
             obj.savename = savename;
+            obj.counter=1;
         end
         
         function WI = compute(obj, x)
@@ -64,17 +66,21 @@ classdef Objective1DAdapSearch
             x0 = 0.05;
             xend = 1.95;
 
-            if (x0 < x) && (x < xend)
                 FUN = @(Ip) obj.ObjectiveQuad_Nvar(Ip, x, Nvar);
                 [WI, ~, ~, t, y] = adaptiveSimpson(FUN, I0, IEND, 'parts', 2);
-                name_ty=append('Rst/', obj.savename, '_x_',num2str(x, '%.3f'),'_date_', obj.creationDate);
-                saveData(name_ty, 't', t, 'y', y);
+                if length(x)==1
+                    name_ty=append('Rst/', obj.savename, '_x_',num2str(x, '%.3f'),'_date_', obj.creationDate);
+                    saveData(name_ty, 't', t, 'y', y);
+                else 
+                    count=obj.counter;
+                    obj.counter=obj.counter+1;
+                    name_ty=append('Rst/', obj.savename, '_x_',num2str(obj.counter),'_date_', obj.creationDate);
+                    saveData(name_ty, 't', t, 'y', y);
+                end
                 disp(['t & y Variables saved to ', name_ty]);
                 WI = -WI;
                 disp(['Objective value: ', sprintf('%.2e', WI)]);
-            else
-                WI = 1000;
-            end
+
         end        
 
         function WI = ObjectiveQuad_1D(obj, Ip, x)
@@ -217,13 +223,25 @@ classdef Objective1DAdapSearch
         end
 
 
-        function ConVal=ComsolVolumeConstraint(obj, Object, Domains, MaxVal)
+        function ConVal=ComsolVolumeConstraint(obj, x, MaxVal, Nvar)
+
+            for i=1:Nvar/2
+                obj.model.param.set(append('p',num2str(i-1)), x(i));
+                obj.model.param.set(append('m',num2str(i-1)), x(i+Nvar/2));
+            end
+
+            % RUN
+            obj.model.component('comp1').geom('geom1').run;
+            obj.model.component('comp1').mesh('mesh1').run;
+
             obj.model.component('comp1').geom('geom1').measure().selection().init(2);
             obj.model.component('comp1').geom('geom1').measure().selection().set('uni1',[1,2]);
             VarComsolVal=obj.model.component('comp1').geom('geom1').measure().getVolume();
             %VarComsolVal=obj.model.component('comp1').geom(Domains).measure().getVolume();
             %VarComsolVal=obj.model.param.get(ComsolVarName); % I KNOW THIS IS WRONG
             ConVal = VarComsolVal/MaxVal-1;
+
+            fprintf('Vol Value: %d, Constraint: %d\n',VarComsolVal, ConVal)
         end
 
         function saveData(obj, folder, mainName)

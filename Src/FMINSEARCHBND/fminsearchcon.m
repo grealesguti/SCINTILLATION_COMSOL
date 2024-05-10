@@ -181,8 +181,14 @@ if ~isempty(A)
   end
 end
 if ~isempty(nonlcon)
-  if any(feval(nonlcon,(reshape(x0,xsize)),varargin{:})>0)
-    error 'Infeasible starting values (nonlinear inequalities failed).'
+  if isempty(varargin{:})
+      if any(feval(nonlcon,(reshape(x0,xsize)))>0)
+        error 'Infeasible starting values (nonlinear inequalities failed).'
+      end
+  else
+      if any(feval(nonlcon,(reshape(x0,xsize)),varargin{:})>0)
+        error 'Infeasible starting values (nonlinear inequalities failed).'
+      end
   end
 end
 
@@ -365,7 +371,14 @@ xtrans = reshape(xtrans,params.xsize);
 % Next, do the nonlinear inequality constraints
 if ~isempty(params.nonlcon)
   % Required: nonlcon(xtrans) <= 0
-  cons = feval(params.nonlcon,xtrans,params.args{:});
+
+  if isempty(params.args{:})
+    cons = feval(params.nonlcon,xtrans);
+  else
+    cons = feval(params.nonlcon,xtrans,params.args{:});
+  end
+
+  
   if any(cons(:) > 0)
     % nonlinear inequality constraints failed. Just return inf.
     fval = inf;
@@ -377,8 +390,11 @@ end
 % do we evaluate the objective function.
 
 % append any additional parameters to the argument list
-fval = feval(params.fun,xtrans,params.args{:});
-
+  if isempty(params.args{:})
+    fval = feval(params.fun,xtrans);
+  else
+    fval = feval(params.fun,xtrans,params.args{:});
+  end
 end % sub function intrafun end
 
 % ======================================

@@ -1,4 +1,7 @@
 function OptimizationND(savename,objective_name,server, Volcon)
+
+    % VolCon Default = 1.707000e-04
+
     LibInitialization()
 	if server
 		addpath('/apps/generic/comsol/6.2/mli/');
@@ -11,8 +14,8 @@ function OptimizationND(savename,objective_name,server, Volcon)
     modelname = 'Scintillator3D_1DStudy_2Dgeom - Spline3.mph';
     
     % Define model constants
-    Surf = [7, 40];
-    Surf_in = [23, 27];
+    Surf = [7, 36];
+    Surf_in = [23, 19];
     %savename = 'Obj_WeWm_';
     maxmeshsize_nominal = 0.0015;
     minmeshsize_nominal = 0.00075;
@@ -25,7 +28,7 @@ function OptimizationND(savename,objective_name,server, Volcon)
     x0=1;
     
     OBJECTIVE = @(x) objectiveFunctionSearch.compute_Nvar(x,Nvar);
-    CONSTRAINT = 
+    CONSTRAINT = @(x) objectiveFunctionSearch.ComsolVolumeConstraint(x, Volcon, Nvar);
     % Define options for fminsearchbnd
     if server
     options = optimset('OutputFcn', @objectiveFunctionSearch.outfun, 'TolFun', 1e-4, 'TolX', 1e-4, 'MaxIter', 200, 'MaxFunEvals', 500);
@@ -40,7 +43,7 @@ function OptimizationND(savename,objective_name,server, Volcon)
     % https://nl.mathworks.com/help/matlab/ref/fminsearch.html
     
     % MISSING VOLUME CONSTRAINT!!!
-    [x_opt,fval,exitflag,output] = fminsearchcon(OBJECTIVE,ones(Nvar,1)*x0,ones(Nvar,1)*xlim(1),ones(Nvar,1)*xlim(2),options,varargin);
+    [x_opt,fval,exitflag,output] = fminsearchcon(OBJECTIVE,ones(Nvar,1)*x0,ones(Nvar,1)*xlim(1),ones(Nvar,1)*xlim(2),[],[],CONSTRAINT,options,varargin);
 
     name_save= append('Rst/', savename, objectiveFunctionSearch.creationDate);
     saveData(name_save, 'x_opt', x_opt, 'fval', fval, 'exitflag', exitflag, 'output', output);
