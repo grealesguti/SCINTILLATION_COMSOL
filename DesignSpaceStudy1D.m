@@ -1,4 +1,18 @@
-function DesignSpaceStudy1D(savename,objective_name,server,steps)
+function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
+
+    % Default values for minmesh and maxmesh
+    defaultMinMesh = 0.00075;
+    defaultMaxMesh = 0.0015;
+    
+    % Check if minmesh and maxmesh are provided, otherwise use defaults
+    if nargin < 4
+        minmesh = defaultMinMesh;
+        maxmesh = defaultMaxMesh;
+    else
+        minmesh = varargin{1};
+        maxmesh = varargin{2};
+    end
+
     LibInitialization()
 	if server
 		addpath('/apps/generic/comsol/6.2/mli/');
@@ -14,8 +28,8 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps)
     Surf = [7, 42];
     Surf_in = [23, 27];
     %savename = 'Obj_WeWm_';
-    maxmeshsize_nominal = 0.0015;
-    minmeshsize_nominal = 0.00075;
+    maxmeshsize_nominal = maxmesh;
+    minmeshsize_nominal = minmesh;
     %objective_name = 'Wm+We';
     
     objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename);
