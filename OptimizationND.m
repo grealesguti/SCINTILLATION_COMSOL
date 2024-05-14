@@ -47,7 +47,7 @@ function OptimizationND(savename,objective_name,server, Volcon, optimizer, x0_fi
     % transformation to a bounded problem using fminsearch. 
     % options and vargaring are directly passed to fminsearch
     % https://nl.mathworks.com/help/matlab/ref/fminsearch.html
-    
+    fprintf(append('optimizer:',optimizer))    
     % Select optimizer based on specified case
    switch optimizer
         case 'fminsearchcon'
