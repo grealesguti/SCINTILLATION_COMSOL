@@ -36,11 +36,11 @@ function OptimizationND(savename,objective_name,server, Volcon,x0_file)
     OBJECTIVE = @(x) objectiveFunctionSearch.compute_Nvar(x,Nvar);
     CONSTRAINT = @(x) objectiveFunctionSearch.ComsolVolumeConstraint(x, Volcon, Nvar);
     % Define options for fminsearchbnd
-    if server
-    options = optimset('OutputFcn', @objectiveFunctionSearch.outfun, 'TolFun', 1e-4, 'TolX', 1e-4, 'MaxIter', 200, 'MaxFunEvals', 500);
-    else
+    %if server
+    %options = optimset('OutputFcn', @objectiveFunctionSearch.outfun, 'TolFun', 1e-4, 'TolX', 1e-4, 'MaxIter', 200, 'MaxFunEvals', 500);
+    %else
     options = optimset('OutputFcn', @objectiveFunctionSearch.outfun, 'Display', 'iter', 'TolFun', 1e-4, 'TolX', 1e-4, 'MaxIter', 200, 'MaxFunEvals', 500);
-    end
+    %end
     varargin = {}; % Define varargin if needed
 
     %% https://nl.mathworks.com/matlabcentral/fileexchange/8277-fminsearchbnd-fminsearchcon
