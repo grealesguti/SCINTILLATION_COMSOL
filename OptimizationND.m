@@ -1,4 +1,4 @@
-function OptimizationND(savename,objective_name,server, Volcon)
+function OptimizationND(savename,objective_name,server, Volcon,x0_file)
 
     % VolCon Default = 1.707000e-04
 
@@ -20,12 +20,18 @@ function OptimizationND(savename,objective_name,server, Volcon)
     maxmeshsize_nominal = 0.0015;
     minmeshsize_nominal = 0.00075;
     %objective_name = 'Wm+We';
-    Nvar = 18;
     
     objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename);
 
     xlim = [0.1,1.9];
-    x0=1;
+    if isempty(x0_file)
+        Nvar = 18;
+        x0 = ones(Nvar,1)*1; % Default value if x0 file is not provided
+    else
+        % Read x0 from the provided file
+        x0 = load(x0_file);
+        Nvar=length(x0);
+    end
     
     OBJECTIVE = @(x) objectiveFunctionSearch.compute_Nvar(x,Nvar);
     CONSTRAINT = @(x) objectiveFunctionSearch.ComsolVolumeConstraint(x, Volcon, Nvar);
@@ -43,7 +49,7 @@ function OptimizationND(savename,objective_name,server, Volcon)
     % https://nl.mathworks.com/help/matlab/ref/fminsearch.html
     
     % MISSING VOLUME CONSTRAINT!!!
-    [x_opt,fval,exitflag,output] = fminsearchcon(OBJECTIVE,ones(Nvar,1)*x0,ones(Nvar,1)*xlim(1),ones(Nvar,1)*xlim(2),[],[],CONSTRAINT,options,varargin);
+    [x_opt,fval,exitflag,output] = fminsearchcon(OBJECTIVE,x0,ones(Nvar,1)*xlim(1),ones(Nvar,1)*xlim(2),[],[],CONSTRAINT,options,varargin);
 
     name_save= append('Rst/', savename, objectiveFunctionSearch.creationDate);
     saveData(name_save, 'x_opt', x_opt, 'fval', fval, 'exitflag', exitflag, 'output', output);
