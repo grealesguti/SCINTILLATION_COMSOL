@@ -225,8 +225,27 @@ classdef Objective1DAdapSearch
 
         end
 
+        function [c, ceq] = ComsolVolumeConstraint_ga(obj, x, MaxVal, Nvar)
+            for i = 1:Nvar/2
+                obj.model.param.set(append('p', num2str(i-1)), x(i));
+                obj.model.param.set(append('m', num2str(i-1)), x(i+Nvar/2));
+            end
+        
+            % RUN
+            obj.model.component('comp1').geom('geom1').run;
+            obj.model.component('comp1').mesh('mesh1').run;
+        
+            obj.model.component('comp1').geom('geom1').measure().selection().init(2);
+            obj.model.component('comp1').geom('geom1').measure().selection().set('uni1',[1,2]);
+            VarComsolVal = obj.model.component('comp1').geom('geom1').measure().getVolume();
+        
+            % Compute constraint values
+            c = VarComsolVal/MaxVal - 1; % Inequality constraint
+            ceq = []; % No equality constraints
+        end
 
-        function ConVal=ComsolVolumeConstraint(obj, x, MaxVal, Nvar)
+
+        function [ConVal]=ComsolVolumeConstraint(obj, x, MaxVal, Nvar)
 
             for i=1:Nvar/2
                 obj.model.param.set(append('p',num2str(i-1)), x(i));
