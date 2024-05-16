@@ -1,5 +1,5 @@
 function Optimization1D(savename,objective_name,server,optimizer,varargin)
-    fprint('### 1D OPTIMIZATION MATLAB ###\n')
+    fprintf('### 1D OPTIMIZATION MATLAB ###\n')
     % Default values for minmesh and maxmesh
     defaultMinMesh = 0.00075;
     defaultMaxMesh = 0.0015;
