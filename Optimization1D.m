@@ -5,12 +5,12 @@ function Optimization1D(savename,objective_name,server,optimizer,varargin)
     defaultMaxMesh = 0.0015;
     
     % Check if minmesh and maxmesh are provided, otherwise use defaults
-    if nargin < 4
+    if nargin < 5
         minmesh = defaultMinMesh;
         maxmesh = defaultMaxMesh;
     else
-        minmesh = defaultMinMesh;
-        maxmesh = defaultMaxMesh;
+        minmesh = varargin{1};
+        maxmesh = varargin{2};
     end
 
     LibInitialization()
