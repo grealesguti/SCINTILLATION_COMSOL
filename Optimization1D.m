@@ -1,10 +1,12 @@
 function Optimization1D(savename,objective_name,server,optimizer,varargin)
+
     fprintf('### 1D OPTIMIZATION MATLAB ###\n')
     % Default values for minmesh and maxmesh
     defaultMinMesh = 0.00075;
     defaultMaxMesh = 0.0015;
+    defaultI0=0.005;
+    defaultIend=0.9;
     
-    % Check if minmesh and maxmesh are provided, otherwise use defaults
     if nargin < 5
         fprintf("Number of inputs, %i\n",nargin)
         minmesh = defaultMinMesh;
@@ -12,6 +14,8 @@ function Optimization1D(savename,objective_name,server,optimizer,varargin)
         maxmesh = defaultMaxMesh;
         fprintf("MaxMesh, %f\n",maxmesh)
         SimpStol=1e-6;
+        I0=defaultI0;
+        Iend=defaultIend;
     else
         fprintf("Number of inputs, %i\n",nargin)
         minmesh = varargin{1};
@@ -19,6 +23,9 @@ function Optimization1D(savename,objective_name,server,optimizer,varargin)
         maxmesh = varargin{2};
         fprintf("MaxMesh, %f\n",maxmesh)
         SimpStol=varargin{3};
+        I0=varargin{4};
+        Iend=varargin{5};
+
     end
     fprintf(append('Objective name: ',objective_name,'\n'))
     fprintf(append('Optimizer name: ',optimizer,'\n'))
@@ -43,7 +50,7 @@ function Optimization1D(savename,objective_name,server,optimizer,varargin)
     minmeshsize_nominal = minmesh;
     %objective_name = 'Wm+We';
     
-   objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename, SimpStol,0.005,0.9);
+   objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename, SimpStol,I0,Iend);
 
     xlim = [0.1,1.9];
     x0=1;
