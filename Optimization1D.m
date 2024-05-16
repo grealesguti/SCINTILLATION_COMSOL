@@ -9,8 +9,8 @@ function Optimization1D(savename,objective_name,server,optimizer,varargin)
         minmesh = defaultMinMesh;
         maxmesh = defaultMaxMesh;
     else
-        minmesh = varargin{1};
-        maxmesh = varargin{2};
+        minmesh = defaultMinMesh;
+        maxmesh = defaultMaxMesh;
     end
 
     LibInitialization()
