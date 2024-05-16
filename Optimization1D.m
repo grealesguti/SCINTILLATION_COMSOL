@@ -1,25 +1,25 @@
 function Optimization1D(savename,objective_name,server,optimizer,varargin)
-
+    fprint('### 1D OPTIMIZATION MATLAB ###\n')
     % Default values for minmesh and maxmesh
     defaultMinMesh = 0.00075;
     defaultMaxMesh = 0.0015;
     
     % Check if minmesh and maxmesh are provided, otherwise use defaults
     if nargin < 5
-        fprintf("Number of inputs, %i",nargin)
+        fprintf("Number of inputs, %i\n",nargin)
         minmesh = defaultMinMesh;
-        fprintf("MinMesh, %f",minmesh)
+        fprintf("MinMesh, %f\n",minmesh)
         maxmesh = defaultMaxMesh;
-        fprintf("MaxMesh, %f",maxmesh)
+        fprintf("MaxMesh, %f\n",maxmesh)
     else
-        fprintf("Number of inputs, %i",nargin)
+        fprintf("Number of inputs, %i\n",nargin)
         minmesh = varargin{1};
-        fprintf("MinMesh, %f",minmesh)
+        fprintf("MinMesh, %f\n",minmesh)
         maxmesh = varargin{2};
-        fprintf("MaxMesh, %f",maxmesh)
+        fprintf("MaxMesh, %f\n",maxmesh)
     end
-    fprintf(append('Objective name: ',objective_name))
-    fprintf(append('Optimizer name: ',optimizer))
+    fprintf(append('Objective name: ',objective_name,'\n'))
+    fprintf(append('Optimizer name: ',optimizer,'\n'))
 
 
     LibInitialization()
