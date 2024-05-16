@@ -1,17 +1,26 @@
 function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
 
+    fprintf('### 1D OPTIMIZATION MATLAB ###\n')
     % Default values for minmesh and maxmesh
     defaultMinMesh = 0.00075;
     defaultMaxMesh = 0.0015;
     
-    % Check if minmesh and maxmesh are provided, otherwise use defaults
-    if nargin < 4
+    if nargin < 5
+        fprintf("Number of inputs, %i\n",nargin)
         minmesh = defaultMinMesh;
+        fprintf("MinMesh, %f\n",minmesh)
         maxmesh = defaultMaxMesh;
+        fprintf("MaxMesh, %f\n",maxmesh)
+        SimpStol=1e-6;
     else
+        fprintf("Number of inputs, %i\n",nargin)
         minmesh = varargin{1};
+        fprintf("MinMesh, %f\n",minmesh)
         maxmesh = varargin{2};
+        fprintf("MaxMesh, %f\n",maxmesh)
+        SimpStol=varargin{3};
     end
+    fprintf(append('Objective name: ',objective_name,'\n'))
 
     LibInitialization()
 	if server
@@ -32,7 +41,7 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
     minmeshsize_nominal = minmesh;
     %objective_name = 'Wm+We';
     
-    objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename);
+    objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename, SimpStol);
     
     x0 = 0.1;
     xend = 1.9;

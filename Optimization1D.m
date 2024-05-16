@@ -11,12 +11,14 @@ function Optimization1D(savename,objective_name,server,optimizer,varargin)
         fprintf("MinMesh, %f\n",minmesh)
         maxmesh = defaultMaxMesh;
         fprintf("MaxMesh, %f\n",maxmesh)
+        SimpStol=1e-6;
     else
         fprintf("Number of inputs, %i\n",nargin)
         minmesh = varargin{1};
         fprintf("MinMesh, %f\n",minmesh)
         maxmesh = varargin{2};
         fprintf("MaxMesh, %f\n",maxmesh)
+        SimpStol=varargin{3};
     end
     fprintf(append('Objective name: ',objective_name,'\n'))
     fprintf(append('Optimizer name: ',optimizer,'\n'))
@@ -41,7 +43,7 @@ function Optimization1D(savename,objective_name,server,optimizer,varargin)
     minmeshsize_nominal = minmesh;
     %objective_name = 'Wm+We';
     
-   objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename);
+   objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename, SimpStol);
 
     xlim = [0.1,1.9];
     x0=1;
