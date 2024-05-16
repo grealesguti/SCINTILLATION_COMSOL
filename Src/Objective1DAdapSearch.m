@@ -11,10 +11,12 @@ classdef Objective1DAdapSearch
         savename
         counter
         SimpStol
+        I0
+        Iend
     end
     
     methods
-        function obj = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surfin, model, plt, objective, savename,SimpStol)
+        function obj = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surfin, model, plt, objective, savename,SimpStol,I0,Iend)
             import com.comsol.model.util.* 
             obj.plt = plt;
             if plt
@@ -30,6 +32,8 @@ classdef Objective1DAdapSearch
             obj.savename = savename;
             obj.counter=1;
             obj.SimpStol=SimpStol;
+            obj.I0=I0;
+            obj.Iend=Iend;
         end
         
         function WI = compute(obj, x)
@@ -38,14 +42,13 @@ classdef Objective1DAdapSearch
             disp(x);
 
             LYSO_L = 0.0275;
-            I0 = 0.01;
-            IEND = 0.9;
+
             x0 = 0.05;
             xend = 1.95;
 
             if (x0 < x) && (x < xend)
                 FUN = @(Ip) obj.ObjectiveQuad_1D(Ip, x);
-                [WI, ~, ~, t, y] = adaptiveSimpson(FUN, I0, IEND, 'parts', 2, 'tol', obj.SimpStol);
+                [WI, ~, ~, t, y] = adaptiveSimpson(FUN, obj.I0, obj.Iend, 'parts', 2, 'tol', obj.SimpStol);
                 name_ty=append('Rst/', obj.savename, '_x_',num2str(x, '%.3f'),'_date_', obj.creationDate);
                 saveData(name_ty, 't', t, 'y', y);
                 disp(['t & y Variables saved to ', name_ty]);
@@ -63,13 +66,11 @@ classdef Objective1DAdapSearch
             disp(x);
 
             LYSO_L = 0.0275;
-            I0 = 0.01;
-            IEND = 0.9;
             x0 = 0.05;
             xend = 1.95;
 
                 FUN = @(Ip) obj.ObjectiveQuad_Nvar(Ip, x, Nvar);
-                [WI, ~, ~, t, y] = adaptiveSimpson(FUN, I0, IEND, 'parts', 2);
+                [WI, ~, ~, t, y] = adaptiveSimpson(FUN, obj.I0, obj.Iend, 'parts', 2);
                 if length(x)==1
                     name_ty=append('Rst/', obj.savename, '_x_',num2str(x, '%.3f'),'_date_', obj.creationDate);
                     saveData(name_ty, 't', t, 'y', y);

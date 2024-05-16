@@ -43,7 +43,7 @@ function Optimization1D(savename,objective_name,server,optimizer,varargin)
     minmeshsize_nominal = minmesh;
     %objective_name = 'Wm+We';
     
-   objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename, SimpStol);
+   objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename, SimpStol,0.005,0.9);
 
     xlim = [0.1,1.9];
     x0=1;

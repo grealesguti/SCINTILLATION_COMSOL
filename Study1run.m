@@ -1,11 +1,9 @@
-function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
+function Study1run(savename,objective_name,server,x,Ip,I0,Iend, varargin)
 
     fprintf('### 1D OPTIMIZATION MATLAB ###\n')
     % Default values for minmesh and maxmesh
     defaultMinMesh = 0.00075;
     defaultMaxMesh = 0.0015;
-    defaultI0=0.005;
-    defaultIend=0.9;
     
     if nargin < 5
         fprintf("Number of inputs, %i\n",nargin)
@@ -14,8 +12,6 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
         maxmesh = defaultMaxMesh;
         fprintf("MaxMesh, %f\n",maxmesh)
         SimpStol=1e-6;
-        I0=defaultI0;
-        Iend=defaultIend;
     else
         fprintf("Number of inputs, %i\n",nargin)
         minmesh = varargin{1};
@@ -23,9 +19,6 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
         maxmesh = varargin{2};
         fprintf("MaxMesh, %f\n",maxmesh)
         SimpStol=varargin{3};
-        I0=varargin{4};
-        Iend=varargin{5};
-
     end
     fprintf(append('Objective name: ',objective_name,'\n'))
 
@@ -49,20 +42,12 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
     %objective_name = 'Wm+We';
     
     objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename, SimpStol,I0,Iend);
+    Nvar=1;
+    Rst=objectiveFunctionSearch.RunModel_Case(Ip, x);
     
-    x0 = 0.1;
-    xend = 1.9;
-    %steps = 50;
-    Rst = zeros(steps + 2, 1);
-    xa = zeros(steps + 2, 1);
-    
-    for i = 1:steps
-        x = x0 + (xend - x0) / steps * (i - 1);
-        disp(x)
-        Rst(i) = objectiveFunctionSearch.compute(x);
-        xa(i) = x;
-        name_save= append('Rst/', savename, objectiveFunctionSearch.creationDate);
-        saveData(name_save, 'xa', xa, 'Rst', Rst, 'objective_name', objective_name, 'modelname', modelname, 'x0', x0, 'xend', xend, 'steps', steps);
-        disp(['xa & Rst Variables saved to ', name_save]);
-    end
+  %      Rst = objectiveFunctionSearch.compute(x);
+  %      xa = x;
+  %      name_save= append('Rst/', savename, objectiveFunctionSearch.creationDate);
+  %      saveData(name_save, 'xa', xa, 'Rst', Rst, 'objective_name', objective_name, 'modelname', modelname, 'x0', x0, 'xend', xend, 'steps', steps);
+  %      disp(['xa & Rst Variables saved to ', name_save]);
 end
