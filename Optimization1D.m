@@ -6,12 +6,21 @@ function Optimization1D(savename,objective_name,server,optimizer,varargin)
     
     % Check if minmesh and maxmesh are provided, otherwise use defaults
     if nargin < 5
+        fprintf("Number of inputs, %i",nargin)
         minmesh = defaultMinMesh;
+        fprintf("MinMesh, %f",minmesh)
         maxmesh = defaultMaxMesh;
+        fprintf("MaxMesh, %f",maxmesh)
     else
+        fprintf("Number of inputs, %i",nargin)
         minmesh = varargin{1};
+        fprintf("MinMesh, %f",minmesh)
         maxmesh = varargin{2};
+        fprintf("MaxMesh, %f",maxmesh)
     end
+    fprintf(append('Objective name: ',objective_name))
+    fprintf(append('Optimizer name: ',optimizer))
+
 
     LibInitialization()
 	if server
@@ -55,22 +64,23 @@ function Optimization1D(savename,objective_name,server,optimizer,varargin)
 
     fprintf(append('optimizer:',optimizer))    
     % Select optimizer based on specified case
+    Nvar=1;
    switch optimizer
         case 'fminsearchcon'
             % Define options for fminsearchcon
             options = optimset('OutputFcn', @objectiveFunctionSearch.outfun, 'Display', 'iter', 'TolFun', 1e-4, 'TolX', 1e-4, 'MaxIter', 200, 'MaxFunEvals', 500);
             varargin = {}; % Define varargin if needed
             % fminsearchcon optimization
-            [x_opt, fval, exitflag, output] = fminsearchcon(OBJECTIVE, x0, ones(Nvar,1)*xlim(1), ones(Nvar,1)*xlim(2), [], [], CONSTRAINT, options, varargin);
+            [x_opt, fval, exitflag, output] = fminsearchcon(OBJECTIVE, x0, ones(Nvar,1)*xlim(1), ones(Nvar,1)*xlim(2), [], [], [], options, varargin);
         case 'ga'
             CONSTRAINT = @(x) objectiveFunctionSearch.ComsolVolumeConstraint_ga(x, Volcon, Nvar);
             % Genetic algorithm options
             ga_options = optimoptions(@ga, 'Display', 'iter', 'MaxGenerations', 100, 'PopulationSize', 50);
-            [x_opt, fval, exitflag, output] = ga(OBJECTIVE, Nvar, [], [], [], [], ones(Nvar,1)*xlim(1), ones(Nvar,1)*xlim(2), CONSTRAINT, ga_options);
+            [x_opt, fval, exitflag, output] = ga(OBJECTIVE, Nvar, [], [], [], [], ones(Nvar,1)*xlim(1), ones(Nvar,1)*xlim(2), [], ga_options);
         case 'patternsearch'
             CONSTRAINT = @(x) objectiveFunctionSearch.ComsolVolumeConstraint_ga(x, Volcon, Nvar);
             options = optimoptions(@patternsearch, 'Display', 'iter');
-            [x_opt, fval, exitflag, output] = patternsearch(OBJECTIVE, x0, [], [], [], [], ones(Nvar,1)*xlim(1), ones(Nvar,1)*xlim(2), CONSTRAINT, options);
+            [x_opt, fval, exitflag, output] = patternsearch(OBJECTIVE, x0, [], [], [], [], ones(Nvar,1)*xlim(1), ones(Nvar,1)*xlim(2), [], options);
         case 'simulannealbnd'
             % NO CONSTRAINT
             options = optimoptions(@simulannealbnd, 'Display', 'iter');
@@ -82,7 +92,7 @@ function Optimization1D(savename,objective_name,server,optimizer,varargin)
         case 'fmincon'
             CONSTRAINT = @(x) objectiveFunctionSearch.ComsolVolumeConstraint_ga(x, Volcon, Nvar);
             options = optimoptions(@fmincon, 'Display', 'iter');
-            [x_opt, fval, exitflag, output] = fmincon(OBJECTIVE, x0, [], [], [], [], ones(Nvar,1)*xlim(1), ones(Nvar,1)*xlim(2), CONSTRAINT, options);
+            [x_opt, fval, exitflag, output] = fmincon(OBJECTIVE, x0, [], [], [], [], ones(Nvar,1)*xlim(1), ones(Nvar,1)*xlim(2), [], options);
         case 'bayesopt'
             CONSTRAINT = @(x) objectiveFunctionSearch.ComsolVolumeConstraint_ga(x, Volcon, Nvar);
             % Define the search space
