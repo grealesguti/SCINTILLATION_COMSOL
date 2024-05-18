@@ -1,5 +1,4 @@
 function OptimizationND(savename,objective_name,server, Volcon, optimizer, x0_file)
-
     % VolCon Default = 1.707000e-04
 
     LibInitialization()

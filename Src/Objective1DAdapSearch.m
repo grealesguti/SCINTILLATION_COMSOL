@@ -286,11 +286,5 @@ classdef Objective1DAdapSearch
             disp(['Variables saved to ', csvFileName]);
         end
 
-        % Define output function
-        function stop = outfun(obj, x, optimValues, state)
-            stop = false; % Continue optimization
-            fprintf('Iteration: %d, x = %f, fval = %f\n', optimValues.iteration, x, optimValues.fval);
-        end
-
     end
 end
