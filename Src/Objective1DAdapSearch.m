@@ -70,7 +70,7 @@ classdef Objective1DAdapSearch
             xend = 1.95;
 
                 FUN = @(Ip) obj.ObjectiveQuad_Nvar(Ip, x, Nvar);
-                [WI, ~, ~, t, y] = adaptiveSimpson(FUN, obj.I0, obj.Iend, 'parts', 2);
+                [WI, ~, ~, t, y] = adaptiveSimpson(FUN, obj.I0, obj.Iend, 'parts', 2, 'tol', obj.SimpStol);
                 if length(x)==1
                     name_ty=append('Rst/', obj.savename, '_x_',num2str(x, '%.3f'),'_date_', obj.creationDate);
                     saveData(name_ty, 't', t, 'y', y);
@@ -109,11 +109,12 @@ classdef Objective1DAdapSearch
         end        
 
 
-        function [Wt] = RunModel_Case_Nvar(obj, Ip, x, Nvar)
+        function [Wt,other] = RunModel_Case_Nvar(obj, Ip, x, Nvar)
             mesh_min = obj.minmeshsize_nominal;
             mesh_max = obj.maxmeshsize_nominal;
             obj.model = obj.model;
             obj.Surf = obj.Surf;
+            other=[];
             
             obj.model.param.set('maxmeshsize', mesh_max);
             obj.model.param.set('minmeshsize', mesh_min);
@@ -143,6 +144,7 @@ classdef Objective1DAdapSearch
                 case 'We'
                     We = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surf);
                     Wt = trapz(We);
+                    other=We;
                 case '(Wm+We)/Wm_in'
                     Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);
                     W_in = mphint2(obj.model, 'temw.Wm', 'line', 'selection', obj.Surfin);
@@ -169,12 +171,13 @@ classdef Objective1DAdapSearch
 
         end
 
-        function [Wt] = RunModel_Case(obj, Ip, x)
+        function [Wt,other] = RunModel_Case(obj, Ip, x)
             mesh_min = obj.minmeshsize_nominal;
             mesh_max = obj.maxmeshsize_nominal;
             obj.model = obj.model;
             obj.Surf = obj.Surf;
-            
+            other=[];
+
             obj.model.param.set('maxmeshsize', mesh_max);
             obj.model.param.set('minmeshsize', mesh_min);
             obj.model.param.set('impact_location', Ip); % loaded as percentage over 1
@@ -199,6 +202,7 @@ classdef Objective1DAdapSearch
                 case 'We'
                     We = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surf);
                     Wt = trapz(We);
+                    other=We;
                 case '(Wm+We)/Wm_in'
                     Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);
                     W_in = mphint2(obj.model, 'temw.Wm', 'line', 'selection', obj.Surfin);

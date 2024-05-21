@@ -1,4 +1,4 @@
-function Study1run(savename,objective_name,server,x,Ip,I0,Iend, varargin)
+function [Rst,other,model]=Study1run(savename,objective_name,server,x,Ip, varargin)
 
     fprintf('### 1D OPTIMIZATION MATLAB ###\n')
     % Default values for minmesh and maxmesh
@@ -12,6 +12,7 @@ function Study1run(savename,objective_name,server,x,Ip,I0,Iend, varargin)
         maxmesh = defaultMaxMesh;
         fprintf("MaxMesh, %f\n",maxmesh)
         SimpStol=1e-6;
+        modelname = 'Scintillator3D_1DStudy_2Dgeomv2 - Copy.mph';
     else
         fprintf("Number of inputs, %i\n",nargin)
         minmesh = varargin{1};
@@ -19,6 +20,11 @@ function Study1run(savename,objective_name,server,x,Ip,I0,Iend, varargin)
         maxmesh = varargin{2};
         fprintf("MaxMesh, %f\n",maxmesh)
         SimpStol=varargin{3};
+        if strcmp(varargin{4},'spline')
+            modelname = 'Scintillator3D_1DStudy_2Dgeom - Spline3.mph';
+        else
+            modelname = 'Scintillator3D_1DStudy_2Dgeomv2 - Copy.mph';
+       end
     end
     fprintf(append('Objective name: ',objective_name,'\n'))
 
@@ -31,20 +37,31 @@ function Study1run(savename,objective_name,server,x,Ip,I0,Iend, varargin)
 	else
 		pltoption=1;
 	end
-    modelname = 'Scintillator3D_1DStudy_2Dgeomv2 - Copy.mph';
     
     % Define model constants
-    Surf = [7, 42];
-    Surf_in = [23, 27];
+    if length(x)==1
+        Surf = [7, 42];
+        Surf_in = [23, 27];
+    else
+        Surf = [7, 36];
+        Surf_in = [23, 19];
+    end
+
     %savename = 'Obj_WeWm_';
     maxmeshsize_nominal = maxmesh;
     minmeshsize_nominal = minmesh;
     %objective_name = 'Wm+We';
+    I0=0.005;
+    Iend=0.9;
     
     objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename, SimpStol,I0,Iend);
     Nvar=1;
-    Rst=objectiveFunctionSearch.RunModel_Case(Ip, x);
-    
+    if length(x)==1
+        [Rst,other]=objectiveFunctionSearch.RunModel_Case(Ip, x);
+    else
+        [Rst,other]=objectiveFunctionSearch.RunModel_Case_Nvar(Ip, x, length(x));
+    end
+    model=objectiveFunctionSearch.model;
   %      Rst = objectiveFunctionSearch.compute(x);
   %      xa = x;
   %      name_save= append('Rst/', savename, objectiveFunctionSearch.creationDate);

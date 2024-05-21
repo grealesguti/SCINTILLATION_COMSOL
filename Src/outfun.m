@@ -25,13 +25,15 @@ function stop = outfun(x, optimValues, state, filename)
             iterData.fval = [iterData.fval; optimValues.fval];
             iterData.x = [iterData.x; x'];
             % Save the iteration data to the specified .mat file
-            save(filename, 'iterData');
+            save(append('Rst/iter_',filename), 'iterData');
             % Print the latest iteration data
-            fprintf('Iteration: %d, Function Count: %d, Function Value: %.6f, x: %s\n', ...
+            fprintf('### outfun ### Iteration: %d, Function Count: %d, Function Value: %.6f, x: %s\n', ...
                     iter, optimValues.funccount, optimValues.fval, x);
         case 'done'
             % Final state
             % Optionally save the final iteration data
-            save(filename, 'iterData');
+            fprintf('### outfun DONE ### Iteration: %d, Function Count: %d, Function Value: %.6f, x: %s\n', ...
+                    iter, optimValues.funccount, optimValues.fval, x);
+            save(append('Rst/iter_',filename), 'iterData');
     end
 end

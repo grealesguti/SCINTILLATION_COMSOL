@@ -1,5 +1,42 @@
-function OptimizationND(savename,objective_name,server, Volcon, optimizer, x0_file)
+function OptimizationND(savename,objective_name,server, Volcon, optimizer, x0_file, varargin)
     % VolCon Default = 1.707000e-04
+
+    % Create a global structure to store iteration data
+    global iterData;
+    iterData.iteration = [];
+    iterData.funccount = [];
+    iterData.fval = [];
+    iterData.x = [];
+
+    fprintf('### 1D OPTIMIZATION MATLAB ###\n')
+    % Default values for minmesh and maxmesh
+    defaultMinMesh = 0.00075;
+    defaultMaxMesh = 0.0015;
+    defaultI0=0.005;
+    defaultIend=0.9;
+    
+    if nargin < 7
+        fprintf("Number of inputs, %i\n",nargin)
+        minmesh = defaultMinMesh;
+        fprintf("MinMesh, %f\n",minmesh)
+        maxmesh = defaultMaxMesh;
+        fprintf("MaxMesh, %f\n",maxmesh)
+        SimpStol=1e-6;
+        I0=defaultI0;
+        Iend=defaultIend;
+    else
+        fprintf("Number of inputs, %i\n",nargin)
+        minmesh = varargin{1};
+        fprintf("MinMesh, %f\n",minmesh)
+        maxmesh = varargin{2};
+        fprintf("MaxMesh, %f\n",maxmesh)
+        SimpStol=varargin{3};
+        I0=varargin{4};
+        Iend=varargin{5};
+
+    end
+    fprintf(append('Objective name: ',objective_name,'\n'))
+    fprintf(append('Optimizer name: ',optimizer,'\n'))
 
     LibInitialization()
 	if server
@@ -19,8 +56,8 @@ function OptimizationND(savename,objective_name,server, Volcon, optimizer, x0_fi
     maxmeshsize_nominal = 0.0015;
     minmeshsize_nominal = 0.00075;
     %objective_name = 'Wm+We';
-    
-    objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename);
+  % objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename, SimpStol,I0,Iend);
+    objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename, SimpStol,I0,Iend);
 
     xlim = [0.1,1.9];
     if isempty(x0_file)
@@ -51,7 +88,7 @@ function OptimizationND(savename,objective_name,server, Volcon, optimizer, x0_fi
    switch optimizer
         case 'fminsearchcon'
             % Define options for fminsearchcon
-            options = optimset('OutputFcn', @objectiveFunctionSearch.outfun, 'Display', 'iter', 'TolFun', 1e-4, 'TolX', 1e-4, 'MaxIter', 200, 'MaxFunEvals', 500);
+            options = optimset('OutputFcn', @(x, optimValues, state) outfun(x, optimValues, state, filename_optim), 'Display', 'iter', 'TolFun', 1e-4, 'TolX', 1e-4, 'MaxIter', 200, 'MaxFunEvals', 500);
             varargin = {}; % Define varargin if needed
             % fminsearchcon optimization
             [x_opt, fval, exitflag, output] = fminsearchcon(OBJECTIVE, x0, ones(Nvar,1)*xlim(1), ones(Nvar,1)*xlim(2), [], [], CONSTRAINT, options, varargin);
