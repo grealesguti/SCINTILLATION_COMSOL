@@ -38,7 +38,7 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
 	else
 		pltoption=1;
 	end
-    modelname = 'Scintillator3D_1DStudy_2Dgeomv2 - Copy.mph';
+    modelname = 'Scintillator3D_1DStudy_2Dgeomv2 - Copyv2.mph';
     
     % Define model constants
     Surf = [7, 42];

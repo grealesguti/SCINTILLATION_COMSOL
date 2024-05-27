@@ -276,6 +276,23 @@ classdef Objective1DAdapSearch
             fprintf('Vol Value: %d, Constraint: %d\n',VarComsolVal, ConVal)
         end
 
+        function [Distance]=ComsolDistancePts(obj,pto1,pto2)
+            % RUN
+            obj.model.component('comp1').geom('geom1').run;
+            geom = obj.model.geom('geom1');
+            vertex = geom.getVertexCoord;
+            pto1_coord = vertex(:,pto1);
+            pto2_coord = vertex(:,pto2);
+            Distance = abs(sqrt(sum((pto1_coord - pto2_coord).^2)));
+            %obj.model.component('comp1').geom('geom1').measure().selection().init(2);
+            %obj.model.component('comp1').geom('geom1').measure().selection().set('dif2',[1]);
+            %VarComsolVal=obj.model.component('comp1').geom('geom1').measure().getVolume();
+            %VarComsolVal=obj.model.component('comp1').geom(Domains).measure().getVolume();
+            %VarComsolVal=obj.model.param.get(ComsolVarName); % I KNOW THIS IS WRONG
+            %ConVal = VarComsolVal/MaxVal-1;
+
+            fprintf('Distance Value: %d\n',Distance)
+        end
         function saveData(obj, folder, mainName)
             % Save variables to .mat file
             matFileName = fullfile(folder, [mainName '_' obj.creationDate '.mat']);
