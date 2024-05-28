@@ -41,8 +41,8 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
     modelname = 'Scintillator3D_1DStudy_2Dgeomv2 - Copyv2.mph';
     
     % Define model constants
-    Surf = [7, 42];
-    Surf_in = [23, 27];
+    Surf = [11, 38];
+    Surf_in = [21, 25];
     %savename = 'Obj_WeWm_';
     maxmeshsize_nominal = maxmesh;
     minmeshsize_nominal = minmesh;
