@@ -125,10 +125,11 @@ while 1
   % regular termination
   if STOP1
     Q = Q + sum(Q2 + diffQ / 15, 2);
-    fprintf('Simpson iter: %f diffmax: %e, tol: %e\n, Q1: %e, Q2: %e', iter, crit, tol, Q1, Q2);
+    fprintf('Simpson iter: %f diffmax: %e, tol: %e\n, Q: %e', iter, crit, tol, Q);
     break
   else
-    fprintf('Simpson iter: %f diffmax: %e, tol: %e, num_int: %f\n', iter, crit, tol, length(idx));
+     Qiter= Q + sum(Q2 + diffQ / 15, 2);
+    fprintf('Simpson iter: %f diffmax: %e, tol: %e, num_int: %f\n, current Q %e', iter, crit, tol, length(idx),Qiter);
   end
   % check if maximal resolution reached
   idxH = find(abs(H) < minH);
