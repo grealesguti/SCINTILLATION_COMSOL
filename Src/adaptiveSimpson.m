@@ -1,4 +1,4 @@
-function [Q, fcnEvals, iter, t, y] = adaptiveSimpson(fcn, a, b, varargin)
+function [Q, fcnEvals, iter, tapp, yapp] = adaptiveSimpson(fcn, a, b, varargin)
 % adaptiveSimpson - Numerically evaluate integral, adaptive Simpson quadrature. 
 %
 % function [Q fcnEvals iter] = adaptiveSimpson(fcn, a, b, varargin)
@@ -104,6 +104,8 @@ B = t(5:4:end);   yB = y(:, 5:4:end);
 C = t(3:4:end-1); yC = y(:, 3:4:end-1);
 D = t(2:4:end-1); yD = y(:, 2:4:end-1);
 E = t(4:4:end-1); yE = y(:, 4:4:end-1);
+tapp=t;
+yapp=y;
 % adaptive Simpson iteration
 while 1
   % number of iteration
@@ -177,6 +179,8 @@ while 1
   if ~isempty(find(~isfinite(max(abs(y))))), poleWarning = 1; end
   % assign new values ob yD and yE
   yD = y(:,1:end/2); yE = y(:,end/2+1: end);
+  yapp=[yapp,y];
+  tapp=[tapp,[D,E]];
 end
 % display warnings
 if any(~isfinite(Q))
