@@ -1,33 +1,58 @@
 function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
 
-    fprintf('### 1D OPTIMIZATION MATLAB ###\n')
-    % Default values for minmesh and maxmesh
+    DesignSpaceStudy1D('savefile', 'We', 0, 100, 'minmesh', 0.00075, 'maxmesh', 0.0015, 'SimpStol', 1e-5, 'I0', 0.005, 'Iend', 0.9, 'Ampl', 1E7, 'x0',0.75,'xend',1.25);
+
+    fprintf('### 1D OPTIMIZATION MATLAB ###\n');
+    
+    Default values for optional parameters
     defaultMinMesh = 0.00075;
     defaultMaxMesh = 0.0015;
-    defaultI0=0.005;
-    defaultIend=0.9;
+    defaultSimpStol = 1e-6;
+    defaultI0 = 0.005;
+    defaultIend = 0.9;
+    defaultAmpl = 1e7;
+    defaultx0 = 0.75;
+    defaultxend = 1.25;
     
-    if nargin < 5
-        fprintf("Number of inputs, %i\n",nargin)
-        minmesh = defaultMinMesh;
-        fprintf("MinMesh, %f\n",minmesh)
-        maxmesh = defaultMaxMesh;
-        fprintf("MaxMesh, %f\n",maxmesh)
-        SimpStol=1e-6;
-        I0=defaultI0;
-        Iend=defaultIend;
-    else
-        fprintf("Number of inputs, %i\n",nargin)
-        minmesh = varargin{1};
-        fprintf("MinMesh, %f\n",minmesh)
-        maxmesh = varargin{2};
-        fprintf("MaxMesh, %f\n",maxmesh)
-        SimpStol=varargin{3};
-        I0=varargin{4};
-        Iend=varargin{5};
+    Create input parser
+    p = inputParser;
+    
+    Add required parameters
+    addRequired(p, 'savename', @ischar);
+    addRequired(p, 'objective_name', @ischar);
+    addRequired(p, 'server', @isnumeric);
+    addRequired(p, 'steps', @isnumeric);
+    
+    Add optional parameters with default values
+    addParameter(p, 'minmesh', defaultMinMesh, @isnumeric);
+    addParameter(p, 'maxmesh', defaultMaxMesh, @isnumeric);
+    addParameter(p, 'SimpStol', defaultSimpStol, @isnumeric);
+    addParameter(p, 'I0', defaultI0, @isnumeric);
+    addParameter(p, 'Iend', defaultIend, @isnumeric);
+    addParameter(p, 'Ampl', defaultAmpl, @isnumeric);
+    addParameter(p, 'x0', defaultx0, @isnumeric);
+    addParameter(p, 'xend', defaultxend, @isnumeric);
+    Parse inputs
+    parse(p, savename, objective_name, server, steps, varargin{:});
+    
+    Retrieve values
+    minmesh = p.Results.minmesh;
+    maxmesh = p.Results.maxmesh;
+    SimpStol = p.Results.SimpStol;
+    I0 = p.Results.I0;
+    Iend = p.Results.Iend;
+    Ampl = p.Results.Ampl;
+    x0 = p.Results.x0;
+    xend = p.Results.xend;    
 
-    end
-    fprintf(append('Objective name: ',objective_name,'\n'))
+    
+    Display input values
+    fprintf('Number of inputs, %i\n', nargin);
+    fprintf('MinMesh, %f\n', minmesh);
+    fprintf('MaxMesh, %f\n', maxmesh);
+    fprintf('SimpStol, %f\n', SimpStol);
+    fprintf('I0, %f\n', I0);
+    fprintf('Iend, %f\n', Iend);
 
     LibInitialization()
 	if server
@@ -40,24 +65,24 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
 	end
     modelname = 'Scintillator3D_1DStudy_2Dgeomv2 - Copyv2.mph';
     
-    % Define model constants
+    Define model constants
     Surf = [11, 38];
     Surf_in = [21, 25];
-    %savename = 'Obj_WeWm_';
+    savename = 'Obj_WeWm_';
     maxmeshsize_nominal = maxmesh;
     minmeshsize_nominal = minmesh;
-    %objective_name = 'Wm+We';
+    objective_name = 'Wm+We';
     
     objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename, SimpStol,I0,Iend);
-    
-    x0 = 0.1;
-    xend = 1.9;
-    %steps = 50;
-    Rst = zeros(steps + 2, 1);
-    xa = zeros(steps + 2, 1);
+    objectiveFunctionSearch.model.param.set('Ampl', Ampl);
+
+
+    steps = 50;
+    Rst = zeros(steps, 1);
+    xa = zeros(steps, 1);
     
     for i = 1:steps
-        x = x0 + (xend - x0) / steps * (i - 1);
+        x = x0 + (xend - x0) / (steps-1) * (i - 1);
         disp(x)
         Rst(i) = objectiveFunctionSearch.compute(x);
         xa(i) = x;

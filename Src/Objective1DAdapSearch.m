@@ -135,7 +135,7 @@ classdef Objective1DAdapSearch
             %saveas(gcf, append('./MeshConv/mesh_',num2str(Ip),'_',num2str(mesh_max),'_',num2str(mesh_min),'.png')); % Change the path as needed
             %saveas(gcf, append('./MeshConv/mesh_',num2str(Ip),'_',num2str(mesh_max),'_',num2str(mesh_min),'.fig')); % Change the path as needed
 
-            obj.model.study('std1').feature('time').set('tlist', 'range(0,1e-11,1.5e-9)');
+            %obj.model.study('std1').feature('time').set('tlist', 'range(0,1e-11,1.5e-9)');
             obj.model.study('std1').run;
             switch obj.objective
                 case 'Wm'
@@ -200,7 +200,7 @@ classdef Objective1DAdapSearch
             %saveas(gcf, append('./MeshConv/mesh_',num2str(Ip),'_',num2str(mesh_max),'_',num2str(mesh_min),'.png')); % Change the path as needed
             %saveas(gcf, append('./MeshConv/mesh_',num2str(Ip),'_',num2str(mesh_max),'_',num2str(mesh_min),'.fig')); % Change the path as needed
 
-            obj.model.study('std1').feature('time').set('tlist', 'range(0,1e-11,1.5e-9)');
+            %obj.model.study('std1').feature('time').set('tlist', 'range(0,1e-11,1.5e-9)');
             obj.model.study('std1').run;
             switch obj.objective
                 case 'Wm'
