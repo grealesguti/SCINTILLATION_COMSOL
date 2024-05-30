@@ -1,10 +1,11 @@
 function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
 
-    DesignSpaceStudy1D('savefile', 'We', 0, 100, 'minmesh', 0.00075, 'maxmesh', 0.0015, 'SimpStol', 1e-5, 'I0', 0.005, 'Iend', 0.9, 'Ampl', 1E7, 'x0',0.75,'xend',1.25);
+
+    %DesignSpaceStudy1D('savefile', 'We', 0, 100, 'minmesh', 0.00075, 'maxmesh', 0.0015, 'SimpStol', 1e-5, 'I0', 0.005, 'Iend', 0.9, 'Ampl', 1E7, 'x0',0.75,'xend',1.25);
 
     fprintf('### 1D OPTIMIZATION MATLAB ###\n');
     
-    Default values for optional parameters
+    %Default values for optional parameters
     defaultMinMesh = 0.00075;
     defaultMaxMesh = 0.0015;
     defaultSimpStol = 1e-6;
@@ -13,17 +14,20 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
     defaultAmpl = 1e7;
     defaultx0 = 0.75;
     defaultxend = 1.25;
-    
-    Create input parser
+    defaulttr = 0.75;
+    defaulttd = 1.25;
+    defaultSurf = [11, 40];
+    defaultSurfin =  [21, 25];
+    defaultmodelname = 'Scintillator3D_1DStudy_2Dgeomv2 - Copyv2.mph';
+    %Create input parser
     p = inputParser;
     
-    Add required parameters
+    %Add required parameters
     addRequired(p, 'savename', @ischar);
-    addRequired(p, 'objective_name', @ischar);
     addRequired(p, 'server', @isnumeric);
     addRequired(p, 'steps', @isnumeric);
     
-    Add optional parameters with default values
+    %Add optional parameters with default values
     addParameter(p, 'minmesh', defaultMinMesh, @isnumeric);
     addParameter(p, 'maxmesh', defaultMaxMesh, @isnumeric);
     addParameter(p, 'SimpStol', defaultSimpStol, @isnumeric);
@@ -32,10 +36,16 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
     addParameter(p, 'Ampl', defaultAmpl, @isnumeric);
     addParameter(p, 'x0', defaultx0, @isnumeric);
     addParameter(p, 'xend', defaultxend, @isnumeric);
-    Parse inputs
-    parse(p, savename, objective_name, server, steps, varargin{:});
+    addParameter(p, 'tr', defaulttr, @isnumeric);
+    addParameter(p, 'td', defaulttd, @isnumeric);
+    addParameter(p, 'Surf', defaultSurf, @isnumeric);
+    addParameter(p, 'Surfin', defaultSurfin, @isnumeric);
+    addParameter(p, 'modelname', defaultmodelname, @isnumeric);
+
+    %Parse inputs
+    parse(p, savename, server, steps, varargin{:});
     
-    Retrieve values
+    %Retrieve values
     minmesh = p.Results.minmesh;
     maxmesh = p.Results.maxmesh;
     SimpStol = p.Results.SimpStol;
@@ -44,9 +54,13 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
     Ampl = p.Results.Ampl;
     x0 = p.Results.x0;
     xend = p.Results.xend;    
+    tr = p.Results.tr;
+    td = p.Results.td;   
+    Surf = p.Results.Surf;
+    Surf_in = p.Results.Surfin;   
+    modelname = p.Results.modelname;   
 
-    
-    Display input values
+    %Display input values
     fprintf('Number of inputs, %i\n', nargin);
     fprintf('MinMesh, %f\n', minmesh);
     fprintf('MaxMesh, %f\n', maxmesh);
@@ -63,15 +77,9 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
 	else
 		pltoption=1;
 	end
-    modelname = 'Scintillator3D_1DStudy_2Dgeomv2 - Copyv2.mph';
-    
-    Define model constants
-    Surf = [11, 38];
-    Surf_in = [21, 25];
-    savename = 'Obj_WeWm_';
+
     maxmeshsize_nominal = maxmesh;
     minmeshsize_nominal = minmesh;
-    objective_name = 'Wm+We';
     
     objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename, SimpStol,I0,Iend);
     objectiveFunctionSearch.model.param.set('Ampl', Ampl);
