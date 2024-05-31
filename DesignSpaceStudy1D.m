@@ -40,7 +40,7 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
     addParameter(p, 'td', defaulttd, @isnumeric);
     addParameter(p, 'Surf', defaultSurf, @isnumeric);
     addParameter(p, 'Surfin', defaultSurfin, @isnumeric);
-    addParameter(p, 'modelname', defaultmodelname, @isnumeric);
+    addParameter(p, 'modelname', defaultmodelname, @ischar);
 
     %Parse inputs
     parse(p, savename, server, steps, varargin{:});
