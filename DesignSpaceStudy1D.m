@@ -17,7 +17,7 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
     defaulttr = 0.75;
     defaulttd = 1.25;
     defaultSurf = [11, 40];
-    defaultSurfin =  [21, 25];
+    defaultSurfin =  [23, 27];
     defaultmodelname = 'Scintillator3D_1DStudy_2Dgeomv2 - Copyv2.mph';
     %Create input parser
     p = inputParser;
