@@ -1,4 +1,4 @@
-function Optimization1D(savename,objective_name,server,optimizer,varargin)
+function Optimization1D(savename, objective_name, server, optimizer, varargin)
     % Create a global structure to store iteration data
     global iterData;
     iterData.iteration = [];
@@ -6,35 +6,80 @@ function Optimization1D(savename,objective_name,server,optimizer,varargin)
     iterData.fval = [];
     iterData.x = [];
 
-    fprintf('### 1D OPTIMIZATION MATLAB ###\n')
-    % Default values for minmesh and maxmesh
+    fprintf('### 1D OPTIMIZATION MATLAB ###\n');
+    
+    % Default values for optional parameters
     defaultMinMesh = 0.00075;
     defaultMaxMesh = 0.0015;
-    defaultI0=0.005;
-    defaultIend=0.9;
-    
-    if nargin < 5
-        fprintf("Number of inputs, %i\n",nargin)
-        minmesh = defaultMinMesh;
-        fprintf("MinMesh, %f\n",minmesh)
-        maxmesh = defaultMaxMesh;
-        fprintf("MaxMesh, %f\n",maxmesh)
-        SimpStol=1e-6;
-        I0=defaultI0;
-        Iend=defaultIend;
-    else
-        fprintf("Number of inputs, %i\n",nargin)
-        minmesh = varargin{1};
-        fprintf("MinMesh, %f\n",minmesh)
-        maxmesh = varargin{2};
-        fprintf("MaxMesh, %f\n",maxmesh)
-        SimpStol=varargin{3};
-        I0=varargin{4};
-        Iend=varargin{5};
+    defaultSimpStol = 1e-6;
+    defaultI0 = 0.005;
+    defaultIend = 0.9;
+    defaultAmpl = 1e7;
+    defaultx0 = 0.75;
+    defaultxend = 1.25;
+    defaulttr = 0.75;
+    defaulttd = 1.25;
+    defaultSurf = [11, 40];
+    defaultSurfin =  [23, 27];
+    defaultmodelname = 'Scintillator3D_1DStudy_2Dgeomplanewavev3.mph';
 
-    end
-    fprintf(append('Objective name: ',objective_name,'\n'))
-    fprintf(append('Optimizer name: ',optimizer,'\n'))
+    % Create input parser
+    p = inputParser;
+    
+    % Add required parameters
+    addRequired(p, 'savename', @ischar);
+    addRequired(p, 'objective_name', @ischar);
+    addRequired(p, 'server', @isnumeric);
+    addRequired(p, 'optimizer', @ischar);
+    
+    % Add optional parameters with default values
+    addParameter(p, 'minmesh', defaultMinMesh, @isnumeric);
+    addParameter(p, 'maxmesh', defaultMaxMesh, @isnumeric);
+    addParameter(p, 'SimpStol', defaultSimpStol, @isnumeric);
+    addParameter(p, 'I0', defaultI0, @isnumeric);
+    addParameter(p, 'Iend', defaultIend, @isnumeric);
+    addParameter(p, 'Ampl', defaultAmpl, @isnumeric);
+    addParameter(p, 'x0', defaultx0, @isnumeric);
+    addParameter(p, 'xend', defaultxend, @isnumeric);
+    addParameter(p, 'tr', defaulttr, @isnumeric);
+    addParameter(p, 'td', defaulttd, @isnumeric);
+    addParameter(p, 'Surf', defaultSurf, @isnumeric);
+    addParameter(p, 'Surfin', defaultSurfin, @isnumeric);
+    addParameter(p, 'modelname', defaultmodelname, @ischar);
+
+    % Parse inputs
+    parse(p, savename, objective_name, server, optimizer, varargin{:});
+    
+    % Retrieve values
+    minmesh = p.Results.minmesh;
+    maxmesh = p.Results.maxmesh;
+    SimpStol = p.Results.SimpStol;
+    I0 = p.Results.I0;
+    Iend = p.Results.Iend;
+    Ampl = p.Results.Ampl;
+    x0 = p.Results.x0;
+    xend = p.Results.xend;    
+    tr = p.Results.tr;
+    td = p.Results.td;   
+    Surf = p.Results.Surf;
+    Surfin = p.Results.Surfin;   
+    modelname = p.Results.modelname;   
+
+    % Display input values
+    fprintf('Number of inputs, %i\n', nargin);
+    fprintf('MinMesh, %f\n', minmesh);
+    fprintf('MaxMesh, %f\n', maxmesh);
+    fprintf('SimpStol, %f\n', SimpStol);
+    fprintf('I0, %f\n', I0);
+    fprintf('Iend, %f\n', Iend);
+    fprintf('Ampl, %f\n', Ampl);
+    fprintf('x0, %f\n', x0);
+    fprintf('xend, %f\n', xend);
+    fprintf('tr, %f\n', tr);
+    fprintf('td, %f\n', td);
+    fprintf('Surf, [%d, %d]\n', Surf);
+    fprintf('Surfin, [%d, %d]\n', Surfin);
+    fprintf('modelname, %s\n', modelname);
 
 
     LibInitialization()
@@ -46,17 +91,13 @@ function Optimization1D(savename,objective_name,server,optimizer,varargin)
 	else
 		pltoption=1;
 	end
-    modelname = 'Scintillator3D_1DStudy_2Dgeomv2 - Copy.mph';
     
-    % Define model constants
-    Surf = [7, 42];
-    Surf_in = [23, 27];
     %savename = 'Obj_WeWm_';
     maxmeshsize_nominal = maxmesh;
     minmeshsize_nominal = minmesh;
     %objective_name = 'Wm+We';
     
-   objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename, SimpStol,I0,Iend);
+    objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename, SimpStol,I0,Iend);
 
     xlim = [0.1,1.9];
     x0=1;
