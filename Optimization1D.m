@@ -107,7 +107,10 @@ function Optimization1D(savename,objective_name,server,optimizer,varargin)
             [x_opt, fval, exitflag, output] = particleswarm(OBJECTIVE, Nvar, ones(Nvar,1)*xlim(1), ones(Nvar,1)*xlim(2), options);
         case 'fmincon'
             CONSTRAINT = @(x) objectiveFunctionSearch.ComsolVolumeConstraint_ga(x, Volcon, Nvar);
-            options = optimoptions(@fmincon, 'Display', 'iter', 'OutputFcn', @(x, optimValues, state) outfun(x, optimValues, state, filename_optim));
+            options = optimoptions(@fmincon, 'Display', 'iter',...
+                'OutputFcn', @(x, optimValues, state) outfun(x, optimValues, state, filename_optim),...
+                'Algorithm', 'sqp',...
+                'HessianApproximation', 'bfgs');
             [x_opt, fval, exitflag, output] = fmincon(OBJECTIVE, x0, [], [], [], [], ones(Nvar,1)*xlim(1), ones(Nvar,1)*xlim(2), [], options);
         case 'bayesopt'
             CONSTRAINT = @(x) objectiveFunctionSearch.ComsolVolumeConstraint_ga(x, Volcon, Nvar);
