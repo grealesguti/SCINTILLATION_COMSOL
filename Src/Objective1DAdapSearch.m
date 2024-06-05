@@ -108,6 +108,52 @@ classdef Objective1DAdapSearch
             WI = WI';
         end        
 
+        function R2 = ObjectiveRhoCond(obj, Ip, x)
+            % Initialize Run function
+            FUN = @(xx) obj.RunModelRhoCond_Case(xx, x);
+            WI = zeros(length(Ip), 1);
+            for i = 1:length(Ip)
+                disp(['Solving impact number: ', num2str(i), ' Out of: ', num2str(length(Ip)), '. Location: ', num2str(Ip(i))]);
+                WI(i) = FUN(Ip(i));
+            end
+            G4rst= obj.funG4RhoCond(Ip);
+            error =  WI./WI(1) - G4rst';
+            R2 = sum(error.^2)*100;
+            figure(2)
+            hold on
+            plot(WI./WI(1))
+            plot(G4rst)
+            hold off
+            disp(['Error R2: ', num2str(R2)]);
+            disp(error)
+
+        end        
+
+
+        function R2 = ObjectiveRhoCondIncr(obj,fig, Ip, Iv, rho)
+            % Initialize Run function
+            FUN = @(xx) obj.RunModelgen(xx);
+            obj.model.param.set('Study1D',Iv)
+            obj.model.param.set('cond_LYSO',rho)
+            WI = zeros(length(Ip), 1);
+
+            for i = 1:length(Ip)
+                disp(['Solving impact number: ', num2str(i), ' Out of: ', num2str(length(Ip)), '. Location: ', num2str(Ip(i))]);
+                WI(i) = FUN(Ip(i));
+            end
+            figure(fig)
+            hold on
+            plot(WI)
+            %plot(G4rst)
+            hold off
+        end        
+
+
+
+        function [G4norm] = funG4RhoCond(obj,Ip)
+            G4norm = 1.0003-0.0075556*Ip+0.065409*Ip.^2;
+        end
+
 
         function [Wt,other] = RunModel_Case_Nvar(obj, Ip, x, Nvar)
             mesh_min = obj.minmeshsize_nominal;
@@ -224,8 +270,74 @@ classdef Objective1DAdapSearch
                 case 'Win'
                     W_in = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surfin);
                     Wt = trapz(W_in);
+                case '(Wm+We)/We_in'
+                    Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);
+                    W_in = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surfin);
+                    Wt = trapz(Wem./W_in);
+                case '(Wm+We)/(We_in+Wm_in)'
+                    Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);
+                    W_in = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surfin);
+                    Wt = trapz(Wem./W_in);
+                case 'Wm+We'
+                    Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);
+                    Wt = trapz(Wem);
+                case '(Wm+We)/(We_in+Wm_in)*ymin'
+                    Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);
+                    W_in = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surfin);
+                    ymin = str2double(regexprep(char(obj.model.param.get('ymin')), '[^\d\.]', ''));
+                    Wt = trapz(Wem./W_in) * (-ymin);
+                otherwise
+                    error('Unknown objective: %s', obj.objective);
+            end
+
+        end
+%%
+        function [Wt,other] = RunModelRhoCond_Case(obj, Ip, x)
+            mesh_min = obj.minmeshsize_nominal;
+            mesh_max = obj.maxmeshsize_nominal;
+            obj.model = obj.model;
+            obj.Surf = obj.Surf;
+            other=[];
+
+            obj.model.param.set('maxmeshsize', mesh_max);
+            obj.model.param.set('minmeshsize', mesh_min);
+            obj.model.param.set('impact_location', Ip); % loaded as percentage over 1
+            obj.model.param.set('Study1D', 1);
+            obj.model.param.set('cond_LYSO', x);
+
+            % RUN
+            obj.model.component('comp1').geom('geom1').run;
+            obj.model.component('comp1').mesh('mesh1').run;
+            figure(1)
+            if obj.plt
+                mphmesh(obj.model)
+            end
+            %saveas(gcf, append('./MeshConv/mesh_',num2str(Ip),'_',num2str(mesh_max),'_',num2str(mesh_min),'.png')); % Change the path as needed
+            %saveas(gcf, append('./MeshConv/mesh_',num2str(Ip),'_',num2str(mesh_max),'_',num2str(mesh_min),'.fig')); % Change the path as needed
+
+            %obj.model.study('std1').feature('time').set('tlist', 'range(0,1e-11,1.5e-9)');
+            obj.model.study('std1').run;
+            switch obj.objective
+                case 'Wm'
+                    Wm = mphint2(obj.model, 'temw.Wm', 'line', 'selection', obj.Surf);
+                    Wt = trapz(Wm);
+                case 'We'
+                    We = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surf);
+                    Wt = trapz(We);
+                    other=We;
+                case '(Wm+We)/Wm_in'
+                    Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);
+                    W_in = mphint2(obj.model, 'temw.Wm', 'line', 'selection', obj.Surfin);
+                    Wt = trapz(Wem./W_in);
+                case 'We/We_in'
+                    Wem = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surf);
+                    W_in = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surfin);
+                    Wt = trapz(Wem)/trapz(W_in);
                 case 'We_in'
                     W_in = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surfin);
+                    Wt = trapz(W_in);
+                case 'Win'
+                    W_in = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surfin);
                     Wt = trapz(W_in);
                 case '(Wm+We)/We_in'
                     Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);
@@ -248,6 +360,77 @@ classdef Objective1DAdapSearch
             end
 
         end
+
+
+
+        function [Wt,other] = RunModelgen(obj, Ip)
+            mesh_min = obj.minmeshsize_nominal;
+            mesh_max = obj.maxmeshsize_nominal;
+            obj.model = obj.model;
+            obj.Surf = obj.Surf;
+            other=[];
+
+            obj.model.param.set('maxmeshsize', mesh_max);
+            obj.model.param.set('minmeshsize', mesh_min);
+            obj.model.param.set('impact_location', Ip); % loaded as percentage over 1
+
+            % RUN
+            obj.model.component('comp1').geom('geom1').run;
+            obj.model.component('comp1').mesh('mesh1').run;
+            figure(1)
+            if obj.plt
+                mphmesh(obj.model)
+            end
+            %saveas(gcf, append('./MeshConv/mesh_',num2str(Ip),'_',num2str(mesh_max),'_',num2str(mesh_min),'.png')); % Change the path as needed
+            %saveas(gcf, append('./MeshConv/mesh_',num2str(Ip),'_',num2str(mesh_max),'_',num2str(mesh_min),'.fig')); % Change the path as needed
+
+            %obj.model.study('std1').feature('time').set('tlist', 'range(0,1e-11,1.5e-9)');
+            obj.model.study('std1').run;
+            switch obj.objective
+                case 'Wm'
+                    Wm = mphint2(obj.model, 'temw.Wm', 'line', 'selection', obj.Surf);
+                    Wt = trapz(Wm);
+                case 'We'
+                    We = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surf);
+                    Wt = trapz(We);
+                    other=We;
+                case '(Wm+We)/Wm_in'
+                    Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);
+                    W_in = mphint2(obj.model, 'temw.Wm', 'line', 'selection', obj.Surfin);
+                    Wt = trapz(Wem./W_in);
+                case 'We/We_in'
+                    Wem = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surf);
+                    W_in = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surfin);
+                    Wt = trapz(Wem)/trapz(W_in);
+                case 'We_in'
+                    W_in = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surfin);
+                    Wt = trapz(W_in);
+                case 'Win'
+                    W_in = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surfin);
+                    Wt = trapz(W_in);
+                case '(Wm+We)/We_in'
+                    Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);
+                    W_in = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surfin);
+                    Wt = trapz(Wem./W_in);
+                case '(Wm+We)/(We_in+Wm_in)'
+                    Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);
+                    W_in = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surfin);
+                    Wt = trapz(Wem./W_in);
+                case 'Wm+We'
+                    Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);
+                    Wt = trapz(Wem);
+                case '(Wm+We)/(We_in+Wm_in)*ymin'
+                    Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);
+                    W_in = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surfin);
+                    ymin = str2double(regexprep(char(obj.model.param.get('ymin')), '[^\d\.]', ''));
+                    Wt = trapz(Wem./W_in) * (-ymin);
+                otherwise
+                    error('Unknown objective: %s', obj.objective);
+            end
+
+        end
+
+        %%
 
         function [c, ceq] = ComsolVolumeConstraint_ga(obj, x, MaxVal, Nvar)
             for i = 1:Nvar/2
