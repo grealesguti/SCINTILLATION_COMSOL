@@ -190,6 +190,7 @@ classdef Objective1DAdapSearch
                 case 'We'
                     We = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surf);
                     Wt = trapz(We);
+                    fprintf('The value of Wt is: %f\n', Wt);
                     other=We;
                 case 'We/We_in'
                     Wem = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surf);
@@ -255,6 +256,7 @@ classdef Objective1DAdapSearch
                 case 'We'
                     We = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surf);
                     Wt = trapz(We);
+                    fprintf('The value of Wt is: %f\n', Wt);
                     other=We;
                 case '(Wm+We)/Wm_in'
                     Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);
@@ -324,6 +326,7 @@ classdef Objective1DAdapSearch
                 case 'We'
                     We = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surf);
                     Wt = trapz(We);
+                    fprintf('The value of Wt is: %f\n', Wt);
                     other=We;
                 case '(Wm+We)/Wm_in'
                     Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);
@@ -393,6 +396,7 @@ classdef Objective1DAdapSearch
                 case 'We'
                     We = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surf);
                     Wt = trapz(We);
+                    fprintf('The value of Wt is: %f\n', Wt);
                     other=We;
                 case '(Wm+We)/Wm_in'
                     Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);

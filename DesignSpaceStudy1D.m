@@ -84,8 +84,6 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
     objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename, SimpStol,I0,Iend);
     objectiveFunctionSearch.model.param.set('Ampl', Ampl);
 
-
-    steps = 50;
     Rst = zeros(steps, 1);
     xa = zeros(steps, 1);
     
