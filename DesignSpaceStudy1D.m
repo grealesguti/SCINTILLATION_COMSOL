@@ -18,6 +18,10 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
     defaulttd = 1.25;
     defaultSurf = [11, 40];
     defaultSurfin =  [23, 27];
+    defaultjRINDEX = 8.3559e-06;
+    defaultjRINDEX_G = 2.5710e-06;
+    defaultjRINDEX_R = 4.1779e-07;
+
     defaultmodelname = 'Scintillator3D_1DStudy_2Dgeomv2 - Copyv2.mph';
     %Create input parser
     p = inputParser;
@@ -41,6 +45,9 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
     addParameter(p, 'Surf', defaultSurf, @isnumeric);
     addParameter(p, 'Surfin', defaultSurfin, @isnumeric);
     addParameter(p, 'modelname', defaultmodelname, @ischar);
+    addParameter(p, 'jRINDEX', defaultjRINDEX, @isnumeric);
+    addParameter(p, 'jRINDEX_G', defaultjRINDEX_G, @isnumeric);
+    addParameter(p, 'jRINDEX_R', defaultjRINDEX_R, @isnumeric);
 
     %Parse inputs
     parse(p, savename, server, steps, varargin{:});
@@ -59,6 +66,10 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
     Surf = p.Results.Surf;
     Surf_in = p.Results.Surfin;   
     modelname = p.Results.modelname;   
+    jRINDEX = p.Results.jRINDEX;
+    jRINDEX_G = p.Results.jRINDEX_G;
+    jRINDEX_R = p.Results.jRINDEX_R;
+
 
     %Display input values
     fprintf('Number of inputs, %i\n', nargin);
@@ -83,6 +94,17 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
     
     objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename, SimpStol,I0,Iend);
     objectiveFunctionSearch.model.param.set('Ampl', Ampl);
+    %objectiveFunctionSearch.model.param.set('t_r', tr);
+    %objectiveFunctionSearch.model.param.set('t_d', td);
+
+    % Try setting the new parameters and catch errors
+    try
+        objectiveFunctionSearch.model.param.set('jRINDEX', jRINDEX);
+        objectiveFunctionSearch.model.param.set('jRINDEX_G', jRINDEX_G);
+        objectiveFunctionSearch.model.param.set('jRINDEX_R', jRINDEX_R);
+    catch ME
+        fprintf('Error setting jRINDEX parameters: %s\n', ME.message);
+    end
 
     Rst = zeros(steps, 1);
     xa = zeros(steps, 1);
