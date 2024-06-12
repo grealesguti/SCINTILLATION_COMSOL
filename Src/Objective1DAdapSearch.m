@@ -189,45 +189,10 @@ classdef Objective1DAdapSearch
 
             %obj.model.study('std1').feature('time').set('tlist', 'range(0,1e-11,1.5e-9)');
             obj.model.study('std1').run;
-            switch obj.objective
-                case 'Wm'
-                    Wm = mphint2(obj.model, 'temw.Wm', 'line', 'selection', obj.Surf);
-                    Wt = trapz(Wm);
-                case 'We'
-                    We = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surf);
+                              We = mphint2(obj.model, obj.objective, 'line', 'selection', obj.Surf);
                     Wt = trapz(We);
-                    fprintf('The value of Wt is: %e\n', Wt);
+                    fprintf('The value of Wt is:  %e\n', Wt);
                     other=We;
-                case 'We/We_in'
-                    Wem = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surf);
-                    W_in = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surfin);
-                    Wt = trapz(Wem)/trapz(W_in);
-                case 'We_in'
-                    W_in = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surfin);
-                    Wt = trapz(W_in);
-                case '(Wm+We)/Wm_in'
-                    Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);
-                    W_in = mphint2(obj.model, 'temw.Wm', 'line', 'selection', obj.Surfin);
-                    Wt = trapz(Wem./W_in);
-                case '(Wm+We)/We_in'
-                    Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);
-                    W_in = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surfin);
-                    Wt = trapz(Wem./W_in);
-                case '(Wm+We)/(We_in+Wm_in)'
-                    Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);
-                    W_in = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surfin);
-                    Wt = trapz(Wem./W_in);
-                case 'Wm+We'
-                    Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);
-                    Wt = trapz(Wem);
-                case '(Wm+We)/(We_in+Wm_in)*ymin'
-                    Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);
-                    W_in = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surfin);
-                    ymin = str2double(regexprep(char(obj.model.param.get('ymin')), '[^\d\.]', ''));
-                    Wt = trapz(Wem./W_in) * (-ymin);
-                otherwise
-                    error('Unknown objective: %s', obj.objective);
-            end
 
         end
 
@@ -288,48 +253,10 @@ classdef Objective1DAdapSearch
 
             %obj.model.study('std1').feature('time').set('tlist', 'range(0,1e-11,1.5e-9)');
             obj.model.study('std1').run;
-            switch obj.objective
-                case 'Wm'
-                    Wm = mphint2(obj.model, 'temw.Wm', 'line', 'selection', obj.Surf);
-                    Wt = trapz(Wm);
-                case 'We'
-                    We = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surf);
+                              We = mphint2(obj.model, obj.objective, 'line', 'selection', obj.Surf);
                     Wt = trapz(We);
                     fprintf('The value of Wt is:  %e\n', Wt);
                     other=We;
-                case '(Wm+We)/Wm_in'
-                    Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);
-                    W_in = mphint2(obj.model, 'temw.Wm', 'line', 'selection', obj.Surfin);
-                    Wt = trapz(Wem./W_in);
-                case 'We/We_in'
-                    Wem = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surf);
-                    W_in = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surfin);
-                    Wt = trapz(Wem)/trapz(W_in);
-                case 'We_in'
-                    W_in = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surfin);
-                    Wt = trapz(W_in);
-                case 'Win'
-                    W_in = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surfin);
-                    Wt = trapz(W_in);
-                case '(Wm+We)/We_in'
-                    Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);
-                    W_in = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surfin);
-                    Wt = trapz(Wem./W_in);
-                case '(Wm+We)/(We_in+Wm_in)'
-                    Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);
-                    W_in = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surfin);
-                    Wt = trapz(Wem./W_in);
-                case 'Wm+We'
-                    Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);
-                    Wt = trapz(Wem);
-                case '(Wm+We)/(We_in+Wm_in)*ymin'
-                    Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);
-                    W_in = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surfin);
-                    ymin = str2double(regexprep(char(obj.model.param.get('ymin')), '[^\d\.]', ''));
-                    Wt = trapz(Wem./W_in) * (-ymin);
-                otherwise
-                    error('Unknown objective: %s', obj.objective);
-            end
 
         end
 
@@ -358,48 +285,10 @@ classdef Objective1DAdapSearch
 
             %obj.model.study('std1').feature('time').set('tlist', 'range(0,1e-11,1.5e-9)');
             obj.model.study('std1').run;
-            switch obj.objective
-                case 'Wm'
-                    Wm = mphint2(obj.model, 'temw.Wm', 'line', 'selection', obj.Surf);
-                    Wt = trapz(Wm);
-                case 'We'
-                    We = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surf);
+                      We = mphint2(obj.model, obj.objective, 'line', 'selection', obj.Surf);
                     Wt = trapz(We);
                     fprintf('The value of Wt is:  %e\n', Wt);
                     other=We;
-                case '(Wm+We)/Wm_in'
-                    Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);
-                    W_in = mphint2(obj.model, 'temw.Wm', 'line', 'selection', obj.Surfin);
-                    Wt = trapz(Wem./W_in);
-                case 'We/We_in'
-                    Wem = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surf);
-                    W_in = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surfin);
-                    Wt = trapz(Wem)/trapz(W_in);
-                case 'We_in'
-                    W_in = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surfin);
-                    Wt = trapz(W_in);
-                case 'Win'
-                    W_in = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surfin);
-                    Wt = trapz(W_in);
-                case '(Wm+We)/We_in'
-                    Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);
-                    W_in = mphint2(obj.model, 'temw.We', 'line', 'selection', obj.Surfin);
-                    Wt = trapz(Wem./W_in);
-                case '(Wm+We)/(We_in+Wm_in)'
-                    Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);
-                    W_in = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surfin);
-                    Wt = trapz(Wem./W_in);
-                case 'Wm+We'
-                    Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);
-                    Wt = trapz(Wem);
-                case '(Wm+We)/(We_in+Wm_in)*ymin'
-                    Wem = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surf);
-                    W_in = mphint2(obj.model, 'temw.Wm+temw.We', 'line', 'selection', obj.Surfin);
-                    ymin = str2double(regexprep(char(obj.model.param.get('ymin')), '[^\d\.]', ''));
-                    Wt = trapz(Wem./W_in) * (-ymin);
-                otherwise
-                    error('Unknown objective: %s', obj.objective);
-            end
 
         end
 
