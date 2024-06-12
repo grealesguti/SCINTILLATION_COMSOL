@@ -6,9 +6,13 @@ function Optimization1D(savename, objective_name, server, optimizer, varargin)
     iterData.fval = [];
     iterData.x = [];
 
+
+
+    %DesignSpaceStudy1D('savefile', 'We', 0, 100, 'minmesh', 0.00075, 'maxmesh', 0.0015, 'SimpStol', 1e-5, 'I0', 0.005, 'Iend', 0.9, 'Ampl', 1E7, 'x0',0.75,'xend',1.25);
+
     fprintf('### 1D OPTIMIZATION MATLAB ###\n');
     
-    % Default values for optional parameters
+    %Default values for optional parameters
     defaultMinMesh = 0.00075;
     defaultMaxMesh = 0.0015;
     defaultSimpStol = 1e-6;
@@ -21,18 +25,21 @@ function Optimization1D(savename, objective_name, server, optimizer, varargin)
     defaulttd = 1.25;
     defaultSurf = [11, 40];
     defaultSurfin =  [23, 27];
-    defaultmodelname = 'Scintillator3D_1DStudy_2Dgeomplanewavev3.mph';
+    defaultjRINDEX = 8.3559e-06;
+    defaultjRINDEX_G = 2.5710e-06;
+    defaultjRINDEX_R = 4.1779e-07;
 
-    % Create input parser
+    defaultmodelname = 'Scintillator3D_1DStudy_2Dgeomv2 - Copyv2.mph';
+    %Create input parser
     p = inputParser;
     
-    % Add required parameters
+    %Add required parameters
     addRequired(p, 'savename', @ischar);
     addRequired(p, 'objective_name', @ischar);
     addRequired(p, 'server', @isnumeric);
-    addRequired(p, 'optimizer', @ischar);
-    
-    % Add optional parameters with default values
+        addRequired(p, 'optimizer', @ischar);
+
+    %Add optional parameters with default values
     addParameter(p, 'minmesh', defaultMinMesh, @isnumeric);
     addParameter(p, 'maxmesh', defaultMaxMesh, @isnumeric);
     addParameter(p, 'SimpStol', defaultSimpStol, @isnumeric);
@@ -46,9 +53,39 @@ function Optimization1D(savename, objective_name, server, optimizer, varargin)
     addParameter(p, 'Surf', defaultSurf, @isnumeric);
     addParameter(p, 'Surfin', defaultSurfin, @isnumeric);
     addParameter(p, 'modelname', defaultmodelname, @ischar);
+    addParameter(p, 'jRINDEX', defaultjRINDEX, @isnumeric);
+    addParameter(p, 'jRINDEX_G', defaultjRINDEX_G, @isnumeric);
+    addParameter(p, 'jRINDEX_R', defaultjRINDEX_R, @isnumeric);
 
-    % Parse inputs
-    parse(p, savename, objective_name, server, optimizer, varargin{:});
+    %Parse inputs
+    parse(p, savename, objective_name, server,optimizer, varargin{:});
+    
+    %Retrieve values
+    minmesh = p.Results.minmesh;
+    maxmesh = p.Results.maxmesh;
+    SimpStol = p.Results.SimpStol;
+    I0 = p.Results.I0;
+    Iend = p.Results.Iend;
+    Ampl = p.Results.Ampl;
+    x0 = p.Results.x0;
+    xend = p.Results.xend;    
+    tr = p.Results.tr;
+    td = p.Results.td;   
+    Surf = p.Results.Surf;
+    Surf_in = p.Results.Surfin;   
+    modelname = p.Results.modelname;   
+    jRINDEX = p.Results.jRINDEX;
+    jRINDEX_G = p.Results.jRINDEX_G;
+    jRINDEX_R = p.Results.jRINDEX_R;
+
+
+    %Display input values
+    fprintf('Number of inputs, %i\n', nargin);
+    fprintf('MinMesh, %f\n', minmesh);
+    fprintf('MaxMesh, %f\n', maxmesh);
+    fprintf('SimpStol, %f\n', SimpStol);
+    fprintf('I0, %f\n', I0);
+    fprintf('Iend, %f\n', Iend);
     
     % Retrieve values
     minmesh = p.Results.minmesh;
@@ -62,7 +99,7 @@ function Optimization1D(savename, objective_name, server, optimizer, varargin)
     tr = p.Results.tr;
     td = p.Results.td;   
     Surf = p.Results.Surf;
-    Surfin = p.Results.Surfin;   
+    Surf_in = p.Results.Surfin;   
     modelname = p.Results.modelname;   
 
     % Display input values
@@ -78,7 +115,7 @@ function Optimization1D(savename, objective_name, server, optimizer, varargin)
     fprintf('tr, %f\n', tr);
     fprintf('td, %f\n', td);
     fprintf('Surf, [%d, %d]\n', Surf);
-    fprintf('Surfin, [%d, %d]\n', Surfin);
+    fprintf('Surfin, [%d, %d]\n', Surf_in);
     fprintf('modelname, %s\n', modelname);
 
 
@@ -98,9 +135,19 @@ function Optimization1D(savename, objective_name, server, optimizer, varargin)
     %objective_name = 'Wm+We';
     
     objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename, SimpStol,I0,Iend);
+    objectiveFunctionSearch.model.param.set('Ampl', Ampl);
+    %objectiveFunctionSearch.model.param.set('t_r', tr);
+    %objectiveFunctionSearch.model.param.set('t_d', td);
 
+    % Try setting the new parameters and catch errors
+    try
+        objectiveFunctionSearch.model.param.set('jRINDEX', jRINDEX);
+        objectiveFunctionSearch.model.param.set('jRINDEX_G', jRINDEX_G);
+        objectiveFunctionSearch.model.param.set('jRINDEX_R', jRINDEX_R);
+    catch ME
+        fprintf('Error setting jRINDEX parameters: %s\n', ME.message);
+    end
     xlim = [0.1,1.9];
-    x0=1;
     
     OBJECTIVE = @(x) objectiveFunctionSearch.compute(x);
     
