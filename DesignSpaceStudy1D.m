@@ -21,6 +21,7 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
     defaultjRINDEX = 8.3559e-06;
     defaultjRINDEX_G = 2.5710e-06;
     defaultjRINDEX_R = 4.1779e-07;
+    defaultint = '1D';
 
     defaultmodelname = 'Scintillator3D_1DStudy_2Dgeomv2 - Copyv2.mph';
     %Create input parser
@@ -28,6 +29,7 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
     
     %Add required parameters
     addRequired(p, 'savename', @ischar);
+    addRequired(p, 'objective_name', @ischar);
     addRequired(p, 'server', @isnumeric);
     addRequired(p, 'steps', @isnumeric);
     
@@ -48,9 +50,10 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
     addParameter(p, 'jRINDEX', defaultjRINDEX, @isnumeric);
     addParameter(p, 'jRINDEX_G', defaultjRINDEX_G, @isnumeric);
     addParameter(p, 'jRINDEX_R', defaultjRINDEX_R, @isnumeric);
+    addParameter(p, 'int', defaultint, @ischar);
 
     %Parse inputs
-    parse(p, savename, server, steps, varargin{:});
+    parse(p, savename,objective_name, server, steps, varargin{:});
     
     %Retrieve values
     minmesh = p.Results.minmesh;
@@ -69,6 +72,7 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
     jRINDEX = p.Results.jRINDEX;
     jRINDEX_G = p.Results.jRINDEX_G;
     jRINDEX_R = p.Results.jRINDEX_R;
+    int = p.Results.int;
 
 
     %Display input values
@@ -92,7 +96,7 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
     maxmeshsize_nominal = maxmesh;
     minmeshsize_nominal = minmesh;
     
-    objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename, SimpStol,I0,Iend);
+    objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename, SimpStol,I0,Iend,int);
     objectiveFunctionSearch.model.param.set('Ampl', Ampl);
     %objectiveFunctionSearch.model.param.set('t_r', tr);
     %objectiveFunctionSearch.model.param.set('t_d', td);

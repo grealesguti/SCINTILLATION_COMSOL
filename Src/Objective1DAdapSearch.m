@@ -13,10 +13,11 @@ classdef Objective1DAdapSearch
         SimpStol
         I0
         Iend
+        intshape
     end
     
     methods
-        function obj = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surfin, model, plt, objective, savename,SimpStol,I0,Iend)
+        function obj = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surfin, model, plt, objective, savename,SimpStol,I0,Iend,int)
             import com.comsol.model.util.* 
             obj.plt = plt;
             if plt
@@ -34,6 +35,11 @@ classdef Objective1DAdapSearch
             obj.SimpStol=SimpStol;
             obj.I0=I0;
             obj.Iend=Iend;
+            if strcmp(int,'2D')
+                obj.intshape = 'surface';
+            else
+                obj.intshape = 'line';
+            end
         end
         
         function WI = compute(obj, x)
@@ -189,7 +195,7 @@ classdef Objective1DAdapSearch
 
             %obj.model.study('std1').feature('time').set('tlist', 'range(0,1e-11,1.5e-9)');
             obj.model.study('std1').run;
-                              We = mphint2(obj.model, obj.objective, 'line', 'selection', obj.Surf);
+                              We = mphint2(obj.model, obj.objective, obj.intshape, 'selection', obj.Surf);
                     Wt = trapz(We);
                     fprintf('The value of Wt is:  %e\n', Wt);
                     other=We;
@@ -221,7 +227,7 @@ classdef Objective1DAdapSearch
             %obj.model.study('std1').feature('time').set('tlist', 'range(0,1e-11,1.5e-9)');
             obj.model.study('std1').run;
 
-                    We = mphint2(obj.model, obj.objective, 'line', 'selection', obj.Surf);
+                    We = mphint2(obj.model, obj.objective, obj.intshape, 'selection', obj.Surf);
                     Wt = trapz(We);
                     fprintf('The value of Wt is:  %e\n', Wt);
                     other=We;
@@ -253,7 +259,7 @@ classdef Objective1DAdapSearch
 
             %obj.model.study('std1').feature('time').set('tlist', 'range(0,1e-11,1.5e-9)');
             obj.model.study('std1').run;
-                              We = mphint2(obj.model, obj.objective, 'line', 'selection', obj.Surf);
+                              We = mphint2(obj.model, obj.objective, obj.intshape, 'selection', obj.Surf);
                     Wt = trapz(We);
                     fprintf('The value of Wt is:  %e\n', Wt);
                     other=We;
@@ -285,7 +291,7 @@ classdef Objective1DAdapSearch
 
             %obj.model.study('std1').feature('time').set('tlist', 'range(0,1e-11,1.5e-9)');
             obj.model.study('std1').run;
-                      We = mphint2(obj.model, obj.objective, 'line', 'selection', obj.Surf);
+                      We = mphint2(obj.model, obj.objective, obj.intshape, 'selection', obj.Surf);
                     Wt = trapz(We);
                     fprintf('The value of Wt is:  %e\n', Wt);
                     other=We;
