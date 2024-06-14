@@ -85,11 +85,13 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
 
     LibInitialization()
 	if server
+        fprintf('Starting Server')
 		addpath('/apps/generic/comsol/6.2/mli/');
 		pause(10);
 		mphstart(2036);
 		pltoption=0;
-	else
+    else
+        fprintf('WARNING: SETTING PLOTS')
 		pltoption=1;
 	end
 
