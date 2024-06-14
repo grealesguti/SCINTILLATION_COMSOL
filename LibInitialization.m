@@ -1,5 +1,5 @@
 function LibInitialization()
-    clear all; close all; clc;
+    %clear all; close all; clc;
     % Add MPH folder to path
     mphFolder = 'Src';  % Replace '/path/to/MPH' with the actual path to your MPH folder
     addpath(genpath(mphFolder)); % genpath adds folders and all subfolders
