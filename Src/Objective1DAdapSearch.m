@@ -228,7 +228,11 @@ classdef Objective1DAdapSearch
             obj.model.study('std1').run;
 
                     We = mphint2(obj.model, obj.objective, obj.intshape, 'selection', obj.Surf);
-                    Wt = trapz(We);
+                    if length(We)>1
+                        Wt = trapz(We);
+                    else
+                        Wt=We;
+                    end
                     fprintf('The value of Wt is:  %e\n', Wt);
                     other=We;
 
