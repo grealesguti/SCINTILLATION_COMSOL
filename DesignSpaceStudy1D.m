@@ -3,7 +3,7 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
 
     %DesignSpaceStudy1D('savefile', 'We', 0, 100, 'minmesh', 0.00075, 'maxmesh', 0.0015, 'SimpStol', 1e-5, 'I0', 0.005, 'Iend', 0.9, 'Ampl', 1E7, 'x0',0.75,'xend',1.25);
 
-    fprintf('### 1D OPTIMIZATION MATLAB ###\n');
+    fprintf('### Study1D MATLAB ###\n');
     
     %Default values for optional parameters
     defaultMinMesh = 0.00075;
