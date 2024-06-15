@@ -32,6 +32,7 @@ function OptimizationND(savename,objective_name,server, optimizer, varargin)
     defaultjRINDEX_G = 2.5710e-06;
     defaultjRINDEX_R = 4.1779e-07;
     defaultx0_file = '';
+    defaultint = '1D';
 
     defaultmodelname = 'Scintillator3D_1DStudy_2Dgeomv2 - Copyv2.mph';
     %Create input parser
@@ -62,6 +63,7 @@ function OptimizationND(savename,objective_name,server, optimizer, varargin)
     addParameter(p, 'jRINDEX_R', defaultjRINDEX_R, @isnumeric);
     addParameter(p, 'x0_file', defaultx0_file, @isnumeric);
     addParameter(p, 'volcon', defaultVolCon, @isnumeric);
+    addParameter(p, 'int', defaultint, @ischar);
 
     %Parse inputs
     parse(p, savename, objective_name, server,optimizer, varargin{:});
@@ -85,6 +87,7 @@ function OptimizationND(savename,objective_name,server, optimizer, varargin)
     jRINDEX_R = p.Results.jRINDEX_R;
     Volcon = p.Results.volcon;
     x0_file = p.Results.x0_file;
+    int = p.Results.int;
 
     %Display input values
     fprintf('Number of inputs, %i\n', nargin);
@@ -112,7 +115,7 @@ function OptimizationND(savename,objective_name,server, optimizer, varargin)
     minmeshsize_nominal = minmesh;
     %objective_name = 'Wm+We';
   % objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename, SimpStol,I0,Iend);
-    objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename, SimpStol,I0,Iend);
+    objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename, SimpStol,I0,Iend,int);
     % Try setting the new parameters and catch errors
     try
         objectiveFunctionSearch.model.param.set('jRINDEX', jRINDEX);
