@@ -137,7 +137,7 @@ function Optimization1D(savename, objective_name, server, optimizer, varargin)
     minmeshsize_nominal = minmesh;
     %objective_name = 'Wm+We';
     
-    objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename, SimpStol,I0,Iend);
+    objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename, SimpStol,I0,Iend,int);
     objectiveFunctionSearch.model.param.set('Ampl', Ampl);
     %objectiveFunctionSearch.model.param.set('t_r', tr);
     %objectiveFunctionSearch.model.param.set('t_d', td);
