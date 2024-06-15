@@ -27,7 +27,9 @@ classdef Objective1DAdapSearch
             obj.maxmeshsize_nominal = maxmeshsize_nominal;
             obj.Surf = Surf;
             obj.Surfin = Surfin;        
+            fprintf('Opening MPH')
             obj.model = mphopen(model);
+            fprintf('Opened')
             obj.creationDate = datestr(now, 'yyyymmdd_HHMM');
             obj.objective = objective;
             obj.savename = savename;

@@ -99,7 +99,7 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
     minmeshsize_nominal = minmesh;
     
     objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename, SimpStol,I0,Iend,int);
-    objectiveFunctionSearch.model.param.set('Ampl', Ampl);
+    %objectiveFunctionSearch.model.param.set('Ampl', Ampl);
     %objectiveFunctionSearch.model.param.set('t_r', tr);
     %objectiveFunctionSearch.model.param.set('t_d', td);
 
