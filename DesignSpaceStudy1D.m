@@ -22,6 +22,7 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
     defaultjRINDEX_G = 2.5710e-06;
     defaultjRINDEX_R = 4.1779e-07;
     defaultint = '1D';
+    defaultport = 2036;
 
     defaultmodelname = 'Scintillator3D_1DStudy_2Dgeomv2 - Copyv2.mph';
     %Create input parser
@@ -51,6 +52,7 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
     addParameter(p, 'jRINDEX_G', defaultjRINDEX_G, @isnumeric);
     addParameter(p, 'jRINDEX_R', defaultjRINDEX_R, @isnumeric);
     addParameter(p, 'int', defaultint, @ischar);
+    addParameter(p, 'port', defaultport, @isnumeric);
 
     %Parse inputs
     parse(p, savename,objective_name, server, steps, varargin{:});
@@ -73,6 +75,7 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
     jRINDEX_G = p.Results.jRINDEX_G;
     jRINDEX_R = p.Results.jRINDEX_R;
     int = p.Results.int;
+    port = p.Results.port;
 
 
     %Display input values
@@ -88,7 +91,7 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
         fprintf('Starting Server')
 		addpath('/apps/generic/comsol/6.2/mli/');
 		pause(10);
-		mphstart(2036);
+		mphstart(port);
 		pltoption=0;
     else
         fprintf('WARNING: SETTING PLOTS')

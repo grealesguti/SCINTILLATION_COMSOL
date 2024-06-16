@@ -33,6 +33,7 @@ function OptimizationND(savename,objective_name,server, optimizer, varargin)
     defaultjRINDEX_R = 4.1779e-07;
     defaultx0_file = '';
     defaultint = '1D';
+    defaultport = 2036;
 
     defaultmodelname = 'Scintillator3D_1DStudy_2Dgeomv2 - Copyv2.mph';
     %Create input parser
@@ -64,6 +65,7 @@ function OptimizationND(savename,objective_name,server, optimizer, varargin)
     addParameter(p, 'x0_file', defaultx0_file, @isnumeric);
     addParameter(p, 'volcon', defaultVolCon, @isnumeric);
     addParameter(p, 'int', defaultint, @ischar);
+    addParameter(p, 'port', defaultport, @isnumeric);
 
     %Parse inputs
     parse(p, savename, objective_name, server,optimizer, varargin{:});
@@ -88,6 +90,7 @@ function OptimizationND(savename,objective_name,server, optimizer, varargin)
     Volcon = p.Results.volcon;
     x0_file = p.Results.x0_file;
     int = p.Results.int;
+    port = p.Results.port;
 
     %Display input values
     fprintf('Number of inputs, %i\n', nargin);
@@ -102,7 +105,7 @@ function OptimizationND(savename,objective_name,server, optimizer, varargin)
 	if server
 		addpath('/apps/generic/comsol/6.2/mli/');
 		pause(10);
-		mphstart(2036);
+		mphstart(port);
 		pltoption=0;
 	else
 		pltoption=1;
