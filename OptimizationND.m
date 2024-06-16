@@ -150,6 +150,7 @@ function OptimizationND(savename,objective_name,server, optimizer, varargin)
     % https://nl.mathworks.com/help/matlab/ref/fminsearch.html
     fprintf(append('optimizer:',optimizer))    
     % Select optimizer based on specified case
+    filename_optim = append(objectiveFunctionSearch.savename,objectiveFunctionSearch.creationDate,'_iter.mat');
    switch optimizer
         case 'fminsearchcon'
             % Define options for fminsearchcon
