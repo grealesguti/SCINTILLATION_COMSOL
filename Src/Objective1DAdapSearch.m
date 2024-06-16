@@ -197,8 +197,12 @@ classdef Objective1DAdapSearch
 
             %obj.model.study('std1').feature('time').set('tlist', 'range(0,1e-11,1.5e-9)');
             obj.model.study('std1').run;
-                              We = mphint2(obj.model, obj.objective, obj.intshape, 'selection', obj.Surf);
-                    Wt = trapz(We);
+                    We = mphint2(obj.model, obj.objective, obj.intshape, 'selection', obj.Surf);
+                    if length(We)>1
+                        Wt = trapz(We);
+                    else
+                        Wt=We;
+                    end
                     fprintf('The value of Wt is:  %e\n', Wt);
                     other=We;
 
@@ -338,7 +342,7 @@ classdef Objective1DAdapSearch
             obj.model.component('comp1').mesh('mesh1').run;
 
             obj.model.component('comp1').geom('geom1').measure().selection().init(2);
-            obj.model.component('comp1').geom('geom1').measure().selection().set('uni1',[1,2]);
+            obj.model.component('comp1').geom('geom1').measure().selection().set('dif2',[1,2]);
             VarComsolVal=obj.model.component('comp1').geom('geom1').measure().getVolume();
             %VarComsolVal=obj.model.component('comp1').geom(Domains).measure().getVolume();
             %VarComsolVal=obj.model.param.get(ComsolVarName); % I KNOW THIS IS WRONG

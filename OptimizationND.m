@@ -1,5 +1,6 @@
 function OptimizationND(savename,objective_name,server, optimizer, varargin)
     % VolCon Default = 1.707000e-04
+    % 1.6217e-04
 
     % Create a global structure to store iteration data
     global iterData;
@@ -110,7 +111,7 @@ function OptimizationND(savename,objective_name,server, optimizer, varargin)
 	else
 		pltoption=1;
 	end
-    modelname = 'Scintillator3D_1DStudy_2Dgeom - Spline3.mph';
+    %modelname = 'Scintillator3D_1DStudy_2Dgeom - Spline3.mph';
     
     % Define model constants
     %savename = 'Obj_WeWm_';
