@@ -131,7 +131,7 @@ function OptimizationND(savename,objective_name,server, optimizer, varargin)
     xlim = [0.1,1.9];
     if isempty(x0_file)
         Nvar = 18;
-        x0 = ones(Nvar,1)*0.95; % Default value if x0 file is not provided
+        x0 = ones(Nvar,1)*0.999; % Default value if x0 file is not provided
     else
         % Read x0 from the provided file
         x0 = load(x0_file);
