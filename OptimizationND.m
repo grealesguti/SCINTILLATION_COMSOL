@@ -35,6 +35,7 @@ function OptimizationND(savename,objective_name,server, optimizer, varargin)
     defaultx0_file = '';
     defaultint = '1D';
     defaultport = 2036;
+    defaultwavelength = '1.5[mm]';
 
     defaultmodelname = 'Scintillator3D_1DStudy_2Dgeomv2 - Copyv2.mph';
     %Create input parser
@@ -67,6 +68,7 @@ function OptimizationND(savename,objective_name,server, optimizer, varargin)
     addParameter(p, 'volcon', defaultVolCon, @isnumeric);
     addParameter(p, 'int', defaultint, @ischar);
     addParameter(p, 'port', defaultport, @isnumeric);
+    addParameter(p, 'wavelength', defaultwavelength, @ischar);
 
     %Parse inputs
     parse(p, savename, objective_name, server,optimizer, varargin{:});
@@ -92,6 +94,7 @@ function OptimizationND(savename,objective_name,server, optimizer, varargin)
     x0_file = p.Results.x0_file;
     int = p.Results.int;
     port = p.Results.port;
+    wavelength = p.Results.wavelength;
 
     %Display input values
     fprintf('Number of inputs, %i\n', nargin);
@@ -125,6 +128,7 @@ function OptimizationND(savename,objective_name,server, optimizer, varargin)
         objectiveFunctionSearch.model.param.set('jRINDEX', jRINDEX);
         objectiveFunctionSearch.model.param.set('jRINDEX_G', jRINDEX_G);
         objectiveFunctionSearch.model.param.set('jRINDEX_R', jRINDEX_R);
+        objectiveFunctionSearch.model.param.set('wavelength', wavelength);
     catch ME
         fprintf('Error setting jRINDEX parameters: %s\n', ME.message);
     end
