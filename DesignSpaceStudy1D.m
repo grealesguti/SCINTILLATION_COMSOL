@@ -23,6 +23,8 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
     defaultjRINDEX_R = 4.1779e-07;
     defaultint = '1D';
     defaultport = 2036;
+    defaultwavelength = '1.5[mm]';
+    defaultdeltaY = 0;
 
     defaultmodelname = 'Scintillator3D_1DStudy_2Dgeomv2 - Copyv2.mph';
     %Create input parser
@@ -53,6 +55,8 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
     addParameter(p, 'jRINDEX_R', defaultjRINDEX_R, @isnumeric);
     addParameter(p, 'int', defaultint, @ischar);
     addParameter(p, 'port', defaultport, @isnumeric);
+    addParameter(p, 'wavelength', defaultwavelength, @ischar);
+    addParameter(p, 'deltaY', defaultdeltaY, @isnumeric);
 
     %Parse inputs
     parse(p, savename,objective_name, server, steps, varargin{:});
@@ -76,6 +80,8 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
     jRINDEX_R = p.Results.jRINDEX_R;
     int = p.Results.int;
     port = p.Results.port;
+    wavelength = p.Results.wavelength;
+    deltaY = p.Results.deltaY;
 
 
     %Display input values
@@ -101,7 +107,7 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
     maxmeshsize_nominal = maxmesh;
     minmeshsize_nominal = minmesh;
     
-    objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename, SimpStol,I0,Iend,int);
+    objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename, SimpStol,I0,Iend,int,deltaY);
     %objectiveFunctionSearch.model.param.set('Ampl', Ampl);
     %objectiveFunctionSearch.model.param.set('t_r', tr);
     %objectiveFunctionSearch.model.param.set('t_d', td);
@@ -111,6 +117,7 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
         objectiveFunctionSearch.model.param.set('jRINDEX', jRINDEX);
         objectiveFunctionSearch.model.param.set('jRINDEX_G', jRINDEX_G);
         objectiveFunctionSearch.model.param.set('jRINDEX_R', jRINDEX_R);
+        objectiveFunctionSearch.model.param.set('wavelength', wavelength);
     catch ME
         fprintf('Error setting jRINDEX parameters: %s\n', ME.message);
     end

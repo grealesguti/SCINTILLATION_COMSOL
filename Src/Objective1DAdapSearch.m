@@ -14,10 +14,11 @@ classdef Objective1DAdapSearch
         I0
         Iend
         intshape
+        deltaY
     end
     
     methods
-        function obj = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surfin, model, plt, objective, savename,SimpStol,I0,Iend,int)
+        function obj = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surfin, model, plt, objective, savename,SimpStol,I0,Iend,int,deltaY)
             import com.comsol.model.util.* 
             obj.plt = plt;
             if plt
@@ -42,6 +43,7 @@ classdef Objective1DAdapSearch
             else
                 obj.intshape = 'line';
             end
+            obj.deltaY=deltaY;
         end
         
         function WI = compute(obj, x)
@@ -203,6 +205,7 @@ classdef Objective1DAdapSearch
                     else
                         Wt=We;
                     end
+
                     fprintf('The value of Wt is:  %e\n', Wt);
                     other=We;
 
@@ -238,6 +241,9 @@ classdef Objective1DAdapSearch
                         Wt = trapz(We);
                     else
                         Wt=We;
+                    end
+                    if obj.deltaY==-1
+                        Wt=Wt/(x+2*(1-x)*Ip);
                     end
                     fprintf('The value of Wt is:  %e\n', Wt);
                     other=We;

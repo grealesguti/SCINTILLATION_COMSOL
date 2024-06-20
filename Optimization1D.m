@@ -29,6 +29,8 @@ function Optimization1D(savename, objective_name, server, optimizer, varargin)
     defaultjRINDEX_G = 2.5710e-06;
     defaultjRINDEX_R = 4.1779e-07;
     defaultint = '1D';
+    defaultwavelength = '1.5[mm]';
+    defaultdeltaY = 0;
 
     defaultmodelname = 'Scintillator3D_1DStudy_2Dgeomv2 - Copyv2.mph';
     %Create input parser
@@ -58,6 +60,8 @@ function Optimization1D(savename, objective_name, server, optimizer, varargin)
     addParameter(p, 'jRINDEX_G', defaultjRINDEX_G, @isnumeric);
     addParameter(p, 'jRINDEX_R', defaultjRINDEX_R, @isnumeric);
     addParameter(p, 'int', defaultint, @ischar);
+    addParameter(p, 'wavelength', defaultwavelength, @ischar);
+    addParameter(p, 'deltaY', defaultdeltaY, @isnumeric);
 
     %Parse inputs
     parse(p, savename, objective_name, server,optimizer, varargin{:});
@@ -80,30 +84,8 @@ function Optimization1D(savename, objective_name, server, optimizer, varargin)
     jRINDEX_G = p.Results.jRINDEX_G;
     jRINDEX_R = p.Results.jRINDEX_R;
     int = p.Results.int;
-
-
-    %Display input values
-    fprintf('Number of inputs, %i\n', nargin);
-    fprintf('MinMesh, %f\n', minmesh);
-    fprintf('MaxMesh, %f\n', maxmesh);
-    fprintf('SimpStol, %f\n', SimpStol);
-    fprintf('I0, %f\n', I0);
-    fprintf('Iend, %f\n', Iend);
-    
-    % Retrieve values
-    minmesh = p.Results.minmesh;
-    maxmesh = p.Results.maxmesh;
-    SimpStol = p.Results.SimpStol;
-    I0 = p.Results.I0;
-    Iend = p.Results.Iend;
-    Ampl = p.Results.Ampl;
-    x0 = p.Results.x0;
-    xend = p.Results.xend;    
-    tr = p.Results.tr;
-    td = p.Results.td;   
-    Surf = p.Results.Surf;
-    Surf_in = p.Results.Surfin;   
-    modelname = p.Results.modelname;   
+    wavelength = p.Results.wavelength;
+    deltaY = p.Results.deltaY;
 
     % Display input values
     fprintf('Number of inputs, %i\n', nargin);
@@ -137,7 +119,7 @@ function Optimization1D(savename, objective_name, server, optimizer, varargin)
     minmeshsize_nominal = minmesh;
     %objective_name = 'Wm+We';
     
-    objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename, SimpStol,I0,Iend,int);
+    objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename, SimpStol,I0,Iend,int,deltaY);
     objectiveFunctionSearch.model.param.set('Ampl', Ampl);
     %objectiveFunctionSearch.model.param.set('t_r', tr);
     %objectiveFunctionSearch.model.param.set('t_d', td);
@@ -147,6 +129,7 @@ function Optimization1D(savename, objective_name, server, optimizer, varargin)
         objectiveFunctionSearch.model.param.set('jRINDEX', jRINDEX);
         objectiveFunctionSearch.model.param.set('jRINDEX_G', jRINDEX_G);
         objectiveFunctionSearch.model.param.set('jRINDEX_R', jRINDEX_R);
+        objectiveFunctionSearch.model.param.set('wavelength', wavelength);
     catch ME
         fprintf('Error setting jRINDEX parameters: %s\n', ME.message);
     end
