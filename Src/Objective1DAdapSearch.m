@@ -250,6 +250,12 @@ classdef Objective1DAdapSearch
                     end
                     if obj.deltaY==-1
                         Wt=Wt/(x+2*(1-x)*Ip);
+                    elseif obj.deltaY>0
+                        obj.model.component('comp1').geom('geom1').measure().selection().init(1);
+                        obj.model.component('comp1').geom('geom1').measure().selection().set('fin',obj.deltaY);
+                        Yval=obj.model.component('comp1').geom('geom1').measure().getVolume();
+                        Wt=Wt/(Yval);
+                    end
                     end
                     fprintf('The value of Wt is:  %e\n', Wt);
                     other=We;
