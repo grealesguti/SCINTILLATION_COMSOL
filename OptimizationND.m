@@ -37,6 +37,7 @@ function OptimizationND(savename,objective_name,server, optimizer, varargin)
     defaultport = 2036;
     defaultwavelength = '1.5[mm]';
     defaultdeltaY = 0;
+    defaultOptx0 = 1;
 
 
     defaultmodelname = 'Scintillator3D_1DStudy_2Dgeomv2 - Copyv2.mph';
@@ -72,6 +73,7 @@ function OptimizationND(savename,objective_name,server, optimizer, varargin)
     addParameter(p, 'port', defaultport, @isnumeric);
     addParameter(p, 'wavelength', defaultwavelength, @ischar);
     addParameter(p, 'deltaY', defaultdeltaY, @isnumeric);
+    addParameter(p, 'Optx0', defaultOptx0, @isnumeric);
 
     %Parse inputs
     parse(p, savename, objective_name, server,optimizer, varargin{:});
@@ -99,6 +101,7 @@ function OptimizationND(savename,objective_name,server, optimizer, varargin)
     port = p.Results.port;
     wavelength = p.Results.wavelength;
     deltaY = p.Results.deltaY;
+    Optx0 = p.Results.Optx0;
 
     %Display input values
     fprintf('Number of inputs, %i\n', nargin);
@@ -139,7 +142,7 @@ function OptimizationND(savename,objective_name,server, optimizer, varargin)
     xlim = [0.1,1.9];
     if isempty(x0_file)
         Nvar = 18;
-        x0 = ones(Nvar,1)*0.999; % Default value if x0 file is not provided
+        x0 = ones(Nvar,1)*Optx0; % Default value if x0 file is not provided
     else
         % Read x0 from the provided file
         x0 = load(x0_file);
