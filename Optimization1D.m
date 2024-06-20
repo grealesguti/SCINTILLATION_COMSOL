@@ -31,6 +31,7 @@ function Optimization1D(savename, objective_name, server, optimizer, varargin)
     defaultint = '1D';
     defaultwavelength = '1.5[mm]';
     defaultdeltaY = 0;
+    defaultOptx0 = 1;
 
     defaultmodelname = 'Scintillator3D_1DStudy_2Dgeomv2 - Copyv2.mph';
     %Create input parser
@@ -62,6 +63,7 @@ function Optimization1D(savename, objective_name, server, optimizer, varargin)
     addParameter(p, 'int', defaultint, @ischar);
     addParameter(p, 'wavelength', defaultwavelength, @ischar);
     addParameter(p, 'deltaY', defaultdeltaY, @isnumeric);
+    addParameter(p, 'Optx0', defaultOptx0, @isnumeric);
 
     %Parse inputs
     parse(p, savename, objective_name, server,optimizer, varargin{:});
@@ -86,6 +88,7 @@ function Optimization1D(savename, objective_name, server, optimizer, varargin)
     int = p.Results.int;
     wavelength = p.Results.wavelength;
     deltaY = p.Results.deltaY;
+    Optx0 = p.Results.Optx0;
 
     % Display input values
     fprintf('Number of inputs, %i\n', nargin);
@@ -161,7 +164,7 @@ function Optimization1D(savename, objective_name, server, optimizer, varargin)
             options = optimset('OutputFcn', @(x, optimValues, state) outfun(x, optimValues, state, filename_optim), 'Display', 'iter', 'TolFun', 1e-4, 'TolX', 1e-4, 'MaxIter', 200, 'MaxFunEvals', 500);
             varargin = {}; % Define varargin if needed
             % fminsearchcon optimization
-            [x_opt, fval, exitflag, output] = fminsearchcon(OBJECTIVE, x0, ones(Nvar,1)*xlim(1), ones(Nvar,1)*xlim(2), [], [], [], options, varargin);
+            [x_opt, fval, exitflag, output] = fminsearchcon(OBJECTIVE, Optx0, ones(Nvar,1)*xlim(1), ones(Nvar,1)*xlim(2), [], [], [], options, varargin);
         case 'ga'
             CONSTRAINT = @(x) objectiveFunctionSearch.ComsolVolumeConstraint_ga(x, Volcon, Nvar);
             % Genetic algorithm options
