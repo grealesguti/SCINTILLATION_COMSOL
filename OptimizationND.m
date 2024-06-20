@@ -36,6 +36,8 @@ function OptimizationND(savename,objective_name,server, optimizer, varargin)
     defaultint = '1D';
     defaultport = 2036;
     defaultwavelength = '1.5[mm]';
+    defaultdeltaY = 0;
+
 
     defaultmodelname = 'Scintillator3D_1DStudy_2Dgeomv2 - Copyv2.mph';
     %Create input parser
@@ -96,6 +98,7 @@ function OptimizationND(savename,objective_name,server, optimizer, varargin)
     int = p.Results.int;
     port = p.Results.port;
     wavelength = p.Results.wavelength;
+    deltaY = p.Results.deltaY;
 
     %Display input values
     fprintf('Number of inputs, %i\n', nargin);
