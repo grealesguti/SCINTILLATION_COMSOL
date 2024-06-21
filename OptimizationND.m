@@ -38,6 +38,7 @@ function OptimizationND(savename,objective_name,server, optimizer, varargin)
     defaultwavelength = '1.5[mm]';
     defaultdeltaY = 0;
     defaultOptx0 = 1;
+        defaultIObject = 'fin';
 
 
     defaultmodelname = 'Scintillator3D_1DStudy_2Dgeomv2 - Copyv2.mph';
@@ -74,6 +75,7 @@ function OptimizationND(savename,objective_name,server, optimizer, varargin)
     addParameter(p, 'wavelength', defaultwavelength, @ischar);
     addParameter(p, 'deltaY', defaultdeltaY, @isnumeric);
     addParameter(p, 'Optx0', defaultOptx0, @isnumeric);
+    addParameter(p, 'IObject', defaultIObject, @ischar);
 
     %Parse inputs
     parse(p, savename, objective_name, server,optimizer, varargin{:});
@@ -102,6 +104,7 @@ function OptimizationND(savename,objective_name,server, optimizer, varargin)
     wavelength = p.Results.wavelength;
     deltaY = p.Results.deltaY;
     Optx0 = p.Results.Optx0;
+    IObject = p.Results.IObject;
 
     %Display input values
     fprintf('Number of inputs, %i\n', nargin);
@@ -129,7 +132,7 @@ function OptimizationND(savename,objective_name,server, optimizer, varargin)
     minmeshsize_nominal = minmesh;
     %objective_name = 'Wm+We';
   % objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename, SimpStol,I0,Iend);
-    objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename, SimpStol,I0,Iend,int,deltaY);
+    objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename, SimpStol,I0,Iend,int,deltaY,IObject);
     % Try setting the new parameters and catch errors
     try
         objectiveFunctionSearch.model.param.set('jRINDEX', jRINDEX);

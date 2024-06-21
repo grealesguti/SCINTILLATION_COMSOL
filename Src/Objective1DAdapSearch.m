@@ -15,10 +15,11 @@ classdef Objective1DAdapSearch
         Iend
         intshape
         deltaY
+        ImpactObject
     end
     
     methods
-        function obj = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surfin, model, plt, objective, savename,SimpStol,I0,Iend,int,deltaY)
+        function obj = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surfin, model, plt, objective, savename,SimpStol,I0,Iend,int,deltaY,IObj)
             import com.comsol.model.util.* 
             obj.plt = plt;
             if plt
@@ -44,6 +45,7 @@ classdef Objective1DAdapSearch
                 obj.intshape = 'line';
             end
             obj.deltaY=deltaY;
+            obj.ImpactObject=IObj;
         end
         
         function WI = compute(obj, x)
@@ -213,7 +215,7 @@ classdef Objective1DAdapSearch
                     end
                     if obj.deltaY>0
                         obj.model.component('comp1').geom('geom1').measure().selection().init(1);
-                        obj.model.component('comp1').geom('geom1').measure().selection().set('fin',obj.deltaY);
+                        obj.model.component('comp1').geom('geom1').measure().selection().set(obj.ImpactObject,obj.deltaY);
                         Yval=obj.model.component('comp1').geom('geom1').measure().getVolume();
                         Wt=Wt/(Yval);
                     end
@@ -260,7 +262,7 @@ classdef Objective1DAdapSearch
                         Wt=Wt/(x+2*(1-x)*Ip);
                     elseif obj.deltaY>0
                         obj.model.component('comp1').geom('geom1').measure().selection().init(1);
-                        obj.model.component('comp1').geom('geom1').measure().selection().set('fin',obj.deltaY);
+                        obj.model.component('comp1').geom('geom1').measure().selection().set(obj.ImpactObject,obj.deltaY);
                         Yval=obj.model.component('comp1').geom('geom1').measure().getVolume();
                         Wt=Wt/(Yval);
                     end
