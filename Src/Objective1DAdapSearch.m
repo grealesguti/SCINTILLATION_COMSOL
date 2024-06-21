@@ -198,8 +198,14 @@ classdef Objective1DAdapSearch
             %saveas(gcf, append('./MeshConv/mesh_',num2str(Ip),'_',num2str(mesh_max),'_',num2str(mesh_min),'.fig')); % Change the path as needed
 
             %obj.model.study('std1').feature('time').set('tlist', 'range(0,1e-11,1.5e-9)');
+
+            % Start the timer
+            tic;
             obj.model.study('std1').run;
-                    We = mphint2(obj.model, obj.objective, obj.intshape, 'selection', obj.Surf);
+            elapsedTime = toc;
+            fprintf('Time taken to run: %.2f seconds\n', elapsedTime);
+            
+            We = mphint2(obj.model, obj.objective, obj.intshape, 'selection', obj.Surf);
                     if length(We)>1
                         Wt = trapz(We);
                     else
@@ -239,8 +245,10 @@ classdef Objective1DAdapSearch
             %saveas(gcf, append('./MeshConv/mesh_',num2str(Ip),'_',num2str(mesh_max),'_',num2str(mesh_min),'.png')); % Change the path as needed
             %saveas(gcf, append('./MeshConv/mesh_',num2str(Ip),'_',num2str(mesh_max),'_',num2str(mesh_min),'.fig')); % Change the path as needed
 
-            %obj.model.study('std1').feature('time').set('tlist', 'range(0,1e-11,1.5e-9)');
+            tic;
             obj.model.study('std1').run;
+            elapsedTime = toc;
+            fprintf('Time taken to run: %.2f seconds\n', elapsedTime);
 
                     We = mphint2(obj.model, obj.objective, obj.intshape, 'selection', obj.Surf);
                     if length(We)>1
@@ -255,7 +263,6 @@ classdef Objective1DAdapSearch
                         obj.model.component('comp1').geom('geom1').measure().selection().set('fin',obj.deltaY);
                         Yval=obj.model.component('comp1').geom('geom1').measure().getVolume();
                         Wt=Wt/(Yval);
-                    end
                     end
                     fprintf('The value of Wt is:  %e\n', Wt);
                     other=We;
@@ -286,8 +293,13 @@ classdef Objective1DAdapSearch
             %saveas(gcf, append('./MeshConv/mesh_',num2str(Ip),'_',num2str(mesh_max),'_',num2str(mesh_min),'.fig')); % Change the path as needed
 
             %obj.model.study('std1').feature('time').set('tlist', 'range(0,1e-11,1.5e-9)');
+            tic;
             obj.model.study('std1').run;
-                              We = mphint2(obj.model, obj.objective, obj.intshape, 'selection', obj.Surf);
+            elapsedTime = toc;
+            fprintf('Time taken to run: %.2f seconds\n', elapsedTime);
+            
+            
+            We = mphint2(obj.model, obj.objective, obj.intshape, 'selection', obj.Surf);
                     Wt = trapz(We);
                     fprintf('The value of Wt is:  %e\n', Wt);
                     other=We;
@@ -317,8 +329,11 @@ classdef Objective1DAdapSearch
             %saveas(gcf, append('./MeshConv/mesh_',num2str(Ip),'_',num2str(mesh_max),'_',num2str(mesh_min),'.png')); % Change the path as needed
             %saveas(gcf, append('./MeshConv/mesh_',num2str(Ip),'_',num2str(mesh_max),'_',num2str(mesh_min),'.fig')); % Change the path as needed
 
-            %obj.model.study('std1').feature('time').set('tlist', 'range(0,1e-11,1.5e-9)');
+                        tic;
             obj.model.study('std1').run;
+            elapsedTime = toc;
+            fprintf('Time taken to run: %.2f seconds\n', elapsedTime);
+
                       We = mphint2(obj.model, obj.objective, obj.intshape, 'selection', obj.Surf);
                     Wt = trapz(We);
                     fprintf('The value of Wt is:  %e\n', Wt);
