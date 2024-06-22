@@ -26,6 +26,7 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
     defaultwavelength = '1.5[mm]';
     defaultdeltaY = 0;
     defaultIObject = 'fin';
+    defaultWeimag = [];
 
     defaultmodelname = 'Scintillator3D_1DStudy_2Dgeomv2 - Copyv2.mph';
     %Create input parser
@@ -59,6 +60,8 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
     addParameter(p, 'wavelength', defaultwavelength, @ischar);
     addParameter(p, 'deltaY', defaultdeltaY, @isnumeric);
     addParameter(p, 'IObject', defaultIObject, @ischar);
+    addParameter(p, 'Weimag', defaultWeimag, @isnumeric);
+
     %Parse inputs
     parse(p, savename,objective_name, server, steps, varargin{:});
     
@@ -84,6 +87,7 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
     wavelength = p.Results.wavelength;
     deltaY = p.Results.deltaY;
     IObject = p.Results.IObject;
+    Weimag = p.Results.Weimag;
 
 
     %Display input values
@@ -109,7 +113,7 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
     maxmeshsize_nominal = maxmesh;
     minmeshsize_nominal = minmesh;
     
-    objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename, SimpStol,I0,Iend,int,deltaY,IObject);
+    objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename, SimpStol,I0,Iend,int,deltaY,IObject,Weimag);
     %objectiveFunctionSearch.model.param.set('Ampl', Ampl);
     %objectiveFunctionSearch.model.param.set('t_r', tr);
     %objectiveFunctionSearch.model.param.set('t_d', td);

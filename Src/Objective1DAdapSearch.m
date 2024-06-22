@@ -16,10 +16,11 @@ classdef Objective1DAdapSearch
         intshape
         deltaY
         ImpactObject
+        Weimag
     end
     
     methods
-        function obj = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surfin, model, plt, objective, savename,SimpStol,I0,Iend,int,deltaY,IObj)
+        function obj = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surfin, model, plt, objective, savename,SimpStol,I0,Iend,int,deltaY,IObj, Weimag)
             import com.comsol.model.util.* 
             obj.plt = plt;
             if plt
@@ -46,6 +47,7 @@ classdef Objective1DAdapSearch
             end
             obj.deltaY=deltaY;
             obj.ImpactObject=IObj;
+            obj.Weimag=Weimag;
         end
         
         function WI = compute(obj, x)
@@ -213,6 +215,10 @@ classdef Objective1DAdapSearch
                     else
                         Wt=We;
                     end
+                    if not(isempty(obj.Weimag))
+                        Weimagval = mphint2(obj.model, 'imag(temw.We)', obj.intshape, 'selection', obj.Weimag);
+                        Wt=Wt-abs(trapz(Weimagval));
+                    end
                     if obj.deltaY>0
                         obj.model.component('comp1').geom('geom1').measure().selection().init(1);
                         obj.model.component('comp1').geom('geom1').measure().selection().set(obj.ImpactObject,obj.deltaY);
@@ -257,6 +263,10 @@ classdef Objective1DAdapSearch
                         Wt = trapz(We);
                     else
                         Wt=We;
+                    end
+                    if not(isempty(obj.Weimag))
+                        Weimagval = mphint2(obj.model, 'imag(temw.We)', obj.intshape, 'selection', obj.Weimag);
+                        Wt=Wt-abs(trapz(Weimagval));
                     end
                     if obj.deltaY==-1
                         Wt=Wt/(x+2*(1-x)*Ip);
