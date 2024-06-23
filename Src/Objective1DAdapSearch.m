@@ -17,6 +17,8 @@ classdef Objective1DAdapSearch
         deltaY
         ImpactObject
         Weimag
+        ydata
+        ymin
     end
     
     methods
@@ -48,6 +50,8 @@ classdef Objective1DAdapSearch
             obj.deltaY=deltaY;
             obj.ImpactObject=IObj;
             obj.Weimag=Weimag;
+            obj.ymin =[];
+            obj.ydata =[];
         end
         
         function WI = compute(obj, x)
@@ -94,11 +98,13 @@ classdef Objective1DAdapSearch
                 if length(x)==1
                     name_ty=append('Rst/', obj.savename, '_x_',num2str(x, '%.3f'),'_date_', obj.creationDate);
                     saveData(name_ty, 't', t, 'y', y);
+                    obj.ydata = y;
                 else 
                     count=obj.counter;
                     obj.counter=obj.counter+1;
                     name_ty=append('Rst/', obj.savename, '_x_',num2str(obj.counter),'_date_', obj.creationDate);
                     saveData(name_ty, 't', t, 'y', y);
+                    obj.ydata = y;
                 end
                 disp(['t & y Variables saved to ', name_ty]);
                 WI = -WI;
@@ -216,7 +222,7 @@ classdef Objective1DAdapSearch
                         Wt=We;
                     end
                     if not(isempty(obj.Weimag))
-                        Weimagval = mphint2(obj.model, 'imag(temw.We)', obj.intshape, 'selection', obj.Weimag);
+                        Weimagval = mphint2(obj.model, 'imag(temw.We)', 'surface', 'selection', obj.Weimag);
                         Wt=Wt-abs(trapz(Weimagval));
                     end
                     if obj.deltaY>0
@@ -265,8 +271,9 @@ classdef Objective1DAdapSearch
                         Wt=We;
                     end
                     if not(isempty(obj.Weimag))
-                        Weimagval = mphint2(obj.model, 'imag(temw.We)', obj.intshape, 'selection', obj.Weimag);
-                        Wt=Wt-abs(trapz(Weimagval));
+                        Weimagval = mphint2(obj.model, 'imag(temw.We)', 'surface', 'selection', obj.Weimag);
+                        Weimagvaltrap=trapz(Weimagval);
+                        Wt=Wt-abs(Weimagvaltrap);
                     end
                     if obj.deltaY==-1
                         Wt=Wt/(x+2*(1-x)*Ip);
@@ -360,7 +367,7 @@ classdef Objective1DAdapSearch
                 obj.model.param.set(append('p', num2str(i-1)), x(i));
                 obj.model.param.set(append('m', num2str(i-1)), x(i+Nvar/2));
             end
-        
+            ceq = [];
             % RUN
             obj.model.component('comp1').geom('geom1').run;
             obj.model.component('comp1').mesh('mesh1').run;
@@ -370,13 +377,24 @@ classdef Objective1DAdapSearch
             VarComsolVal = obj.model.component('comp1').geom('geom1').measure().getVolume();
         
             % Compute constraint values
-            c = VarComsolVal/MaxVal - 1; % Inequality constraint
+            cv = VarComsolVal/MaxVal - 1; % Inequality constraint
+            if isempty(obj.ymin)
+                c=zeros(length(x)/2+1);
+            else
+                c=zeros(length(x)/2+2);
+                c(end)= obj.ydata/obj.ymin-1;
+            end
+           
+            c(1)=cv;
+            for i = 1:length(x)/2
+               c(i+1) = (x(i)+x(i+length(x)/2))/0.5-1;
+            end
             ceq = []; % No equality constraints
         end
 
 
-        function [ConVal]=ComsolVolumeConstraint(obj, x, MaxVal, Nvar)
-
+        function [c, ceq]=ComsolVolumeConstraint(obj, x, MaxVal, Nvar)
+            ceq = [];
             for i=1:Nvar/2
                 obj.model.param.set(append('p',num2str(i-1)), x(i));
                 obj.model.param.set(append('m',num2str(i-1)), x(i+Nvar/2));
@@ -391,9 +409,23 @@ classdef Objective1DAdapSearch
             VarComsolVal=obj.model.component('comp1').geom('geom1').measure().getVolume();
             %VarComsolVal=obj.model.component('comp1').geom(Domains).measure().getVolume();
             %VarComsolVal=obj.model.param.get(ComsolVarName); % I KNOW THIS IS WRONG
-            ConVal = VarComsolVal/MaxVal-1;
+            cv = VarComsolVal/MaxVal-1;
 
-            fprintf('Vol Value: %d, Constraint: %d\n',VarComsolVal, ConVal)
+
+            % Compute constraint values
+            if isempty(obj.ymin)
+                c=zeros(length(x)/2+1,1);
+            else
+                c=zeros(length(x)/2+2,1);
+                c(end)= obj.ydata/obj.ymin-1;
+            end
+           
+            c(1)=cv;
+            for i = 1:length(x)/2
+               c(i+1) = -(x(i)+x(i+length(x)/2))/0.5+1;
+            end
+
+            fprintf('Vol Value: %d, Constraint: %d\n',VarComsolVal, cv)
         end
 
         function [Distance]=ComsolDistancePts(obj,pto1,pto2)
