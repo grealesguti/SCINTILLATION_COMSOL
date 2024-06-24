@@ -422,7 +422,7 @@ classdef Objective1DAdapSearch
            
             c(1)=cv;
             for i = 1:length(x)/2
-               c(i+1) = -(x(i)+x(i+length(x)/2))/0.5+1;
+               c(i+1) = -(x(i)+x(i+length(x)/2))/1+1;
             end
 
             fprintf('Vol Value: %d, Constraint: %d\n',VarComsolVal, cv)
