@@ -51,7 +51,7 @@ classdef Objective1DAdapSearch
             obj.deltaY=deltaY;
             obj.ImpactObject=IObj;
             obj.Weimag=Weimag;
-            obj.ymin =[];
+            obj.ymin =4.352009e-02/1.5;
             obj.ydata =[];
         end
         
@@ -429,7 +429,7 @@ classdef Objective1DAdapSearch
                 c=zeros(length(x)/2+1,1);
             else
                 c=zeros(length(x)/2+2,1);
-                c(end)= obj.ydata/obj.ymin-1;
+                c(end)= min(y)/obj.ymin-1;
             end
            
             c(1)=cv;
