@@ -19,6 +19,7 @@ classdef Objective1DAdapSearch
         Weimag
         ydata
         ymin
+        We
     end
     
     methods
@@ -92,7 +93,7 @@ classdef Objective1DAdapSearch
             LYSO_L = 0.0275;
             x0 = 0.05;
             xend = 1.95;
-
+            if isempty(obj.We)
                 FUN = @(Ip) obj.ObjectiveQuad_Nvar(Ip, x, Nvar);
                 [WI, ~, ~, t, y] = adaptiveSimpson(FUN, obj.I0, obj.Iend, 'parts', 2, 'tol', obj.SimpStol);
                 if length(x)==1
@@ -109,6 +110,11 @@ classdef Objective1DAdapSearch
                 disp(['t & y Variables saved to ', name_ty]);
                 WI = -WI;
                 disp(['Objective value: ', sprintf('%.2e', WI)]);
+            else
+                WI=obj.We;
+                disp(['Objective value: ', sprintf('%.2e', WI)]);
+                obj.We=[];
+            end
 
         end        
 
@@ -398,6 +404,12 @@ classdef Objective1DAdapSearch
             for i=1:Nvar/2
                 obj.model.param.set(append('p',num2str(i-1)), x(i));
                 obj.model.param.set(append('m',num2str(i-1)), x(i+Nvar/2));
+            end
+
+            if isempty(obj.We)
+                FUN = @(Ip) obj.ObjectiveQuad_Nvar(Ip, x, Nvar);
+                [WI, ~, ~, t, y] = adaptiveSimpson(FUN, obj.I0, obj.Iend, 'parts', 2, 'tol', obj.SimpStol);
+                obj.We=WI;
             end
 
             % RUN
