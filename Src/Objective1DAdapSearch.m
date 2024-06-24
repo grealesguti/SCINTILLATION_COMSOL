@@ -429,7 +429,7 @@ classdef Objective1DAdapSearch
                 c=zeros(length(x)/2+1,1);
             else
                 c=zeros(length(x)/2+2,1);
-                c(end)= min(y)/obj.ymin-1;
+                c(end)= -min(y)/obj.ymin+1;
             end
            
             c(1)=cv;
