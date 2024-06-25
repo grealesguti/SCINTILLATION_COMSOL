@@ -158,7 +158,7 @@ function OptimizationND(savename,objective_name,server, optimizer, varargin)
     %if server
     %options = optimset('OutputFcn', @objectiveFunctionSearch.outfun, 'TolFun', 1e-4, 'TolX', 1e-4, 'MaxIter', 200, 'MaxFunEvals', 500);
     %else
-    options = optimset('OutputFcn', @objectiveFunctionSearch.outfun, 'Display', 'iter', 'TolFun', 1e-4, 'TolX', 1e-4, 'MaxIter', 1000, 'MaxFunEvals', 500);
+    options = optimset('OutputFcn', @objectiveFunctionSearch.outfun, 'Display', 'iter', 'TolFun', 1e-4, 'TolX', 1e-4, 'MaxIter', 1000, 'MaxFunEvals', 1000);
     %end
     varargin = {}; % Define varargin if needed
 
@@ -172,7 +172,7 @@ function OptimizationND(savename,objective_name,server, optimizer, varargin)
    switch optimizer
         case 'fminsearchcon'
             % Define options for fminsearchcon
-            options = optimset('OutputFcn', @(x, optimValues, state) outfun(x, optimValues, state, filename_optim), 'Display', 'iter', 'TolFun', 1e-4, 'TolX', 1e-4, 'MaxIter', 200, 'MaxFunEvals', 500);
+            options = optimset('OutputFcn', @(x, optimValues, state) outfun(x, optimValues, state, filename_optim), 'Display', 'iter', 'TolFun', 1e-4, 'TolX', 1e-4, 'MaxIter', 1000, 'MaxFunEvals', 1000);
             varargin = {}; % Define varargin if needed
             % fminsearchcon optimization
             [x_opt, fval, exitflag, output] = fminsearchcon(OBJECTIVE, x0, ones(Nvar,1)*xlim(1), ones(Nvar,1)*xlim(2), [], [], CONSTRAINT, options, varargin);
