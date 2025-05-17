@@ -21,6 +21,7 @@ classdef Objective1DAdapSearch
         ymin
         We
         mindist
+        parts
     end
     
     methods
@@ -30,6 +31,7 @@ classdef Objective1DAdapSearch
             if plt
                 ModelUtil.showProgress(true);
             end
+            obj.parts = 2;
             obj.minmeshsize_nominal = minmeshsize_nominal;
             obj.maxmeshsize_nominal = maxmeshsize_nominal;
             obj.Surf = Surf;
@@ -69,7 +71,7 @@ classdef Objective1DAdapSearch
 
             if (x0 < x) && (x < xend)
                 FUN = @(Ip) obj.ObjectiveQuad_1D(Ip, x);
-                [WI, ~, ~, t, y] = adaptiveSimpson(FUN, obj.I0, obj.Iend, 'parts', 2, 'tol', obj.SimpStol);
+                [WI, ~, ~, t, y] = adaptiveSimpson(FUN, obj.I0, obj.Iend, 'parts', obj.parts, 'tol', obj.SimpStol);
                 name_ty=append('Rst/', obj.savename, '_x_',num2str(x, '%.3f'),'_date_', obj.creationDate);
                 if obj.plt
                     figure(2)
@@ -97,7 +99,7 @@ classdef Objective1DAdapSearch
             xend = 1.95;
             if isempty(obj.We)
                 FUN = @(Ip) obj.ObjectiveQuad_Nvar(Ip, x, Nvar);
-                [WI, ~, ~, t, y] = adaptiveSimpson(FUN, obj.I0, obj.Iend, 'parts', 2, 'tol', obj.SimpStol);
+                [WI, ~, ~, t, y] = adaptiveSimpson(FUN, obj.I0, obj.Iend, 'parts', obj.parts, 'tol', obj.SimpStol);
                 if length(x)==1
                     name_ty=append('Rst/', obj.savename, '_x_',num2str(x, '%.3f'),'_date_', obj.creationDate);
                     saveData(name_ty, 't', t, 'y', y);
@@ -410,7 +412,7 @@ classdef Objective1DAdapSearch
 
             if isempty(obj.We)
                 FUN = @(Ip) obj.ObjectiveQuad_Nvar(Ip, x, Nvar);
-                [WI, ~, ~, t, y] = adaptiveSimpson(FUN, obj.I0, obj.Iend, 'parts', 2, 'tol', obj.SimpStol);
+                [WI, ~, ~, t, y] = adaptiveSimpson(FUN, obj.I0, obj.Iend, 'parts', obj.parts, 'tol', obj.SimpStol);
                 obj.We=WI;
             end
 

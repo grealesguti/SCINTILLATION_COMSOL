@@ -27,6 +27,7 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
     defaultdeltaY = 0;
     defaultIObject = 'fin';
     defaultWeimag = [];
+defaultParts = 2;  % Set default value to 2
 
     defaultmodelname = 'Scintillator3D_1DStudy_2Dgeomv2 - Copyv2.mph';
     %Create input parser
@@ -61,7 +62,7 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
     addParameter(p, 'deltaY', defaultdeltaY, @isnumeric);
     addParameter(p, 'IObject', defaultIObject, @ischar);
     addParameter(p, 'Weimag', defaultWeimag, @isnumeric);
-
+addParameter(p, 'parts', defaultParts, @isnumeric);  % <-- This line sets 'parts' default to 2
     %Parse inputs
     parse(p, savename,objective_name, server, steps, varargin{:});
     
@@ -88,7 +89,7 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
     deltaY = p.Results.deltaY;
     IObject = p.Results.IObject;
     Weimag = p.Results.Weimag;
-
+parts = p.Results.parts;  % <-- Retrieve parts input
 
     %Display input values
     fprintf('Number of inputs, %i\n', nargin);
@@ -114,7 +115,8 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
     minmeshsize_nominal = minmesh;
     
     objectiveFunctionSearch = Objective1DAdapSearch(minmeshsize_nominal, maxmeshsize_nominal, Surf, Surf_in, modelname, pltoption, objective_name, savename, SimpStol,I0,Iend,int,deltaY,IObject,Weimag);
-    %objectiveFunctionSearch.model.param.set('Ampl', Ampl);
+    objectiveFunctionSearch.parts=parts;
+    objectiveFunctionSearch.model.param.set('Ampl', Ampl);
     %objectiveFunctionSearch.model.param.set('t_r', tr);
     %objectiveFunctionSearch.model.param.set('t_d', td);
 
@@ -139,5 +141,7 @@ function DesignSpaceStudy1D(savename,objective_name,server,steps, varargin)
         name_save= append('Rst/', savename, objectiveFunctionSearch.creationDate);
         saveData(name_save, 'xa', xa, 'Rst', Rst, 'objective_name', objective_name, 'modelname', modelname, 'x0', x0, 'xend', xend, 'steps', steps);
         disp(['xa & Rst Variables saved to ', name_save]);
+     figure(3)
+    plot(xa(xa>0),-Rst(xa>0));
     end
 end
