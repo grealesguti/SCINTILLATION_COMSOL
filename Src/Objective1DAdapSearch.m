@@ -74,10 +74,19 @@ classdef Objective1DAdapSearch
                 [WI, ~, ~, t, y] = adaptiveSimpson(FUN, obj.I0, obj.Iend, 'parts', obj.parts, 'tol', obj.SimpStol);
                 name_ty=append('Rst/', obj.savename, '_x_',num2str(x, '%.3f'),'_date_', obj.creationDate);
                 if obj.plt
+%                     figure(2)
+%                     hold on 
+%                     plot(t,y)
+%                     figure(1)
+                    % Sort t in increasing order and reorder y accordingly
+                    [t_sorted, idx] = sort(t);
+                    y_sorted = y(idx);
+                
                     figure(2)
                     hold on 
-                    plot(t,y)
-                    figure(1)
+                    plot(t_sorted, y_sorted)
+                
+                    figure(1)                    
                 end
                 saveData(name_ty, 't', t, 'y', y);
                 disp(['t & y Variables saved to ', name_ty]);

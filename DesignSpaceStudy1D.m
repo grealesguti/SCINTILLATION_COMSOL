@@ -141,7 +141,61 @@ parts = p.Results.parts;  % <-- Retrieve parts input
         name_save= append('Rst/', savename, objectiveFunctionSearch.creationDate);
         saveData(name_save, 'xa', xa, 'Rst', Rst, 'objective_name', objective_name, 'modelname', modelname, 'x0', x0, 'xend', xend, 'steps', steps);
         disp(['xa & Rst Variables saved to ', name_save]);
-     figure(3)
-    plot(xa(xa>0),-Rst(xa>0));
+
+        figure(3)
+        plot(xa(xa > 0), -Rst(xa > 0));
+        title(append('Energy Deposition vs Position' , wavelength));
+        xlabel('Position (x)');
+        ylabel('Energy Deposition (Rst)');
+        % Construct full save name
+        name_save = fullfile('Rst/', append(savename, objectiveFunctionSearch.creationDate, '.png'));
+        % Save the figure
+        saveas(gcf, name_save);
+
     end
+% Inside your loop
+figure(4)
+hold on
+
+    % Plot current curve with label
+    plot(xa(xa > 0), -Rst(xa > 0), 'DisplayName', wavelength);
+    
+    % Update labels and title (safe to call multiple times)
+    xlabel('Position (x)');
+    ylabel('Energy Deposition (Rst)');
+    title('Energy Deposition vs Position for Different Wavelengths');
+    
+    % Show legend with all plotted curves
+    legend('Location', 'best');
+
+% Construct full save name with a unique identifier
+name_save = fullfile('Rst/', append(savename, objectiveFunctionSearch.creationDate, '_multiWavelength.png'));
+
+% Save the final figure
+saveas(figure(4), name_save);
+
+% --- Figure 5: Normalized curves ---
+figure(5);
+hold on;
+
+% Extract and normalize data
+xvals = xa(xa > 0);
+yvals = -Rst(xa > 0);
+yvals_norm = (yvals - min(yvals)) / (max(yvals) - min(yvals));  % Normalize to [0, 1]
+
+% Plot normalized curve with wavelength label
+plot(xvals, yvals_norm, 'DisplayName',  wavelength);
+
+% Add labels and title
+xlabel('Position (x)');
+ylabel('Normalized Energy Deposition');
+title('Normalized Energy Deposition vs Position for Different Wavelengths');
+legend('Location', 'best');
+
+name_save_norm = fullfile('Rst/', append(savename, objectiveFunctionSearch.creationDate, '_normmultiWavelength.png'));
+
+%name_save_norm = fullfile('Rst/', ...
+%    sprintf('%s_%s_lambda_%.2fmm_normalized.png', savename, objectiveFunctionSearch.creationDate, '_normmultiWavelength.png'));
+saveas(gcf, name_save_norm);
+
 end
